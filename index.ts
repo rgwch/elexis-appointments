@@ -45,22 +45,24 @@ async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
     return freeSlots;
 }
 
-function checkAccess(birthdate: string, mail: string) {
+function checkAccess(birthdate: string, mail: string): Promise<boolean> {
     const db = new SQL(process.env.database!)
     const dat = (birthdate || "01.01").split(".")
-    if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return false
+    if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(false)
     const elexisdate = dat[2].padStart(4, '0') + dat[1].padStart(2, '0') + dat[0].padStart(2, '0')
 
     return db`
-        SELECT * FROM patienten 
-        WHERE gebdat=${elexisdate} AND email=${mail}
+        SELECT * FROM kontakt 
+        WHERE geburtsdatum=${elexisdate} AND email=${mail}
     `.then(results => {
         return results.length > 0;
     });
 }
 
 getFreeSlotsAt(new Date(2026, 1, 7)).then(results => {
-
     console.log(results)
-    process.exit(0);
+});
+checkAccess("15.06.1980", "test@test.ch").then(access => {
+    console.log("Access:", access)
+    process.exit(0)
 });
