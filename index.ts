@@ -62,7 +62,7 @@ function checkAccess(birthdate: string, mail: string): Promise<boolean> {
 getFreeSlotsAt(new Date(2026, 1, 7)).then(results => {
     console.log(results)
 });
-checkAccess("15.06.1980", "test@test.ch").then(access => {
+checkAccess("1.2.1950", "testperson@elexis.ch").then(access => {
     console.log("Access:", access)
     process.exit(0)
 });
