@@ -73,16 +73,16 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
     return freeSlots;
 }
 
-export async function takeSlot(startMinute: number, duration: number, patId: string): Promise<string> {
+export async function takeSlot(date: string, startMinute: number, duration: number, patId: string): Promise<string> {
     const db = new SQL(process.env.database!)
-    const now = new Date()
+    const now = new Date(date)
     const elexisdate = now.getFullYear().toString().padStart(4, '0') +
         (now.getMonth()).toString().padStart(2, '0') +
         now.getDate().toString().padStart(2, '0')
     const palmid =
         Math.random().toString(36).substring(2, 10)
     await db`
-        INSERT INTO agnte   rmine (bereich, tag, beginn, dauer, deleted, palmid, patid) 
+        INSERT INTO agntermine (bereich, tag, beginn, dauer, deleted, palmid, patid) 
         VALUES (${process.env.bereich || "Arzt"}, ${elexisdate}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId})
     `
     console.log(`Booked slot at ${startMinute} for ${duration} minutes on ${elexisdate}`);

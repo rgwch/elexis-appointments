@@ -1,5 +1,10 @@
 <script lang="ts">
-    import { getFreeSlotsAt, bookAppointment } from './io';
+    import {
+        getFreeSlotsAt,
+        bookAppointment,
+        findNextPossibleDate,
+        findPrevPossibleDate,
+    } from './io';
     import { _ } from 'svelte-i18n';
 
     let selectedDate: string = '';
@@ -7,6 +12,11 @@
     let selectedSlot: number | null = null;
     let loading: boolean = false;
     let message: string = '';
+    let navigating: boolean = false;
+
+    // Set minimum date to today
+    const today = new Date();
+    const minDate = today.toISOString().split('T')[0];
 
     async function handleDateChange() {
         if (!selectedDate) return;
@@ -29,6 +39,47 @@
         }
     }
 
+    async function navigateToNextDate() {
+        if (navigating || loading) return;
+        navigating = true;
+        message = '';
+
+        try {
+            const currentDate = selectedDate
+                ? new Date(selectedDate)
+                : new Date();
+            currentDate.setDate(currentDate.getDate() + 1); // Start from next day
+            const nextDate = await findNextPossibleDate(currentDate);
+            selectedDate = nextDate.toISOString().split('T')[0];
+            await handleDateChange();
+        } catch (e) {
+            message = $_('no_slots_available');
+            console.error(e);
+        } finally {
+            navigating = false;
+        }
+    }
+
+    async function navigateToPrevDate() {
+        if (navigating || loading) return;
+        navigating = true;
+        message = '';
+
+        try {
+            const currentDate = selectedDate
+                ? new Date(selectedDate)
+                : new Date();
+            const prevDate = await findPrevPossibleDate(currentDate);
+            selectedDate = prevDate.toISOString().split('T')[0];
+            await handleDateChange();
+        } catch (e) {
+            message = $_('no_slots_available');
+            console.error(e);
+        } finally {
+            navigating = false;
+        }
+    }
+
     function formatTime(minutes: number): string {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
@@ -46,7 +97,11 @@
 
         try {
             const duration = 30; // Default duration, adjust as needed
-            const success = await bookAppointment(selectedSlot, duration);
+            const success = await bookAppointment(
+                new Date(selectedDate),
+                selectedSlot,
+                duration,
+            );
 
             if (success) {
                 message = $_('appointment_booked');
@@ -85,12 +140,45 @@
             </svg>
             {$_('select_date')}
         </label>
-        <input
-            type="date"
-            id="date"
-            bind:value={selectedDate}
-            on:change={handleDateChange}
-            disabled={loading} />
+        <div class="date-input-container">
+            <button
+                type="button"
+                class="nav-button nav-prev"
+                on:click={navigateToPrevDate}
+                disabled={loading || navigating || !selectedDate}
+                title="Previous available date">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <input
+                type="date"
+                id="date"
+                bind:value={selectedDate}
+                on:change={handleDateChange}
+                min={minDate}
+                disabled={loading || navigating} />
+            <button
+                type="button"
+                class="nav-button nav-next"
+                on:click={navigateToNextDate}
+                disabled={loading || navigating}
+                title="Next available date">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
     </div>
 
     {#if loading}
@@ -178,8 +266,46 @@
         font-size: 0.9rem;
     }
 
+    .date-input-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-button {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 0;
+    }
+
+    .nav-button svg {
+        width: 20px;
+        height: 20px;
+        color: #667eea;
+    }
+
+    .nav-button:hover:not(:disabled) {
+        border-color: #667eea;
+        background-color: #f7fafc;
+    }
+
+    .nav-button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background-color: #f7fafc;
+    }
+
     .date-selector input[type='date'] {
-        width: 100%;
+        flex: 1;
         padding: 0.875rem 1rem;
         border: 2px solid #e2e8f0;
         border-radius: 10px;

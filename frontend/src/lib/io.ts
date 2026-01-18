@@ -40,9 +40,40 @@ export async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
     return data.freeSlots
 }
 
-export async function bookAppointment(startMinute: number, duration: number): Promise<boolean> {
+export const findNextPossibleDate = async (startDate: Date): Promise<Date> => {
+    let date = new Date(startDate)
+    for (let i = 0; i < 30; i++) { // Limit search to next 30 days
+        const freeSlots = await getFreeSlotsAt(date)
+        if (freeSlots.length > 0) {
+            return date
+        }
+        date.setDate(date.getDate() + 1)
+    }
+    throw new Error("No available dates in the next 30 days")
+}
+
+export const findPrevPossibleDate = async (startDate: Date): Promise<Date> => {
+    let date = new Date(startDate)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    for (let i = 0; i < 30; i++) { // Limit search to previous 30 days
+        date.setDate(date.getDate() - 1)
+        if (date < today) {
+            throw new Error("No available dates found (reached current date)")
+        }
+        const freeSlots = await getFreeSlotsAt(date)
+        if (freeSlots.length > 0) {
+            return date
+        }
+    }
+    throw new Error("No available dates in the previous 30 days")
+}
+
+export async function bookAppointment(date: Date, startMinute: number, duration: number): Promise<boolean> {
     const headers = createHeader()
     const body = {
+        date: date.toISOString(),
         startMinute,
         duration,
         patId: user.id
