@@ -12,7 +12,7 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
     const day = date.getDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
-    const elexisdate = year.toString().padStart(4, '0') + (month - 1).toString().padStart(2, '0') + day.toString().padStart(2, '0')
+    const elexisdate = year.toString().padStart(4, '0') + (month).toString().padStart(2, '0') + day.toString().padStart(2, '0')
     const results = await db`
         SELECT * FROM agntermine 
         WHERE tag=${elexisdate} AND deleted="0" AND bereich=${process.env.bereich || "Arzt"}
@@ -77,16 +77,21 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
     const db = new SQL(process.env.database!)
     const now = new Date(date)
     const elexisdate = now.getFullYear().toString().padStart(4, '0') +
-        (now.getMonth()).toString().padStart(2, '0') +
+        (now.getMonth() + 1).toString().padStart(2, '0') +
         now.getDate().toString().padStart(2, '0')
     const palmid =
         Math.random().toString(36).substring(2, 10)
-    await db`
+    try {
+        await db`
         INSERT INTO agntermine (bereich, tag, beginn, dauer, deleted, palmid, patid) 
         VALUES (${process.env.bereich || "Arzt"}, ${elexisdate}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId})
     `
-    console.log(`Booked slot at ${startMinute} for ${duration} minutes on ${elexisdate}`);
-    return palmid;
+        console.log(`Booked slot at ${startMinute} for ${duration} minutes on ${elexisdate}`);
+        return palmid;
+    } catch (e) {
+        console.error("Error booking slot:", e)
+        throw e
+    }
 }
 
 export async function deleteAppointment(palmid: string, patid: string): Promise<void> {

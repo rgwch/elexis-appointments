@@ -30,11 +30,12 @@ server.addRoute("post", "/api/takeslot", async (req, res) => {
     const startMinute = body.startMinute
     const duration = body.duration || parseInt(process.env.defaultAppointmentDuration || "15")
     const patId = body.patId
-    if (startMinute === undefined || patId === undefined) {
+    const date = body.date
+    if (startMinute === undefined || patId === undefined || !date) {
         server.error(res, 400, "Missing parameters")
         return false
     }
-    const slotID = await takeSlot(startMinute, duration, patId)
+    const slotID = await takeSlot(date, startMinute, duration, patId)
     server.sendJson(res, { success: true, slotID: slotID })
     return false
 })
