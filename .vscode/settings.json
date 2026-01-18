@@ -1,0 +1,4 @@
+{
+    "npm.scriptRunner": "bun",
+    "bun.debugTerminal.stopOnEntry": true
+}

@@ -1,5 +1,6 @@
 export const baseURL = import.meta.env.DEV ? "http://localhost:3341" : ""
 let jwtToken: string | null = null
+let user: any = null
 
 export async function checkAccess(birthdate: string, mail: string): Promise<boolean> {
     try {
@@ -8,12 +9,13 @@ export async function checkAccess(birthdate: string, mail: string): Promise<bool
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ birthdate, mail })
+            body: JSON.stringify({ password: mail, username: birthdate })
         }
-        const response = await fetch(baseURL + `/api/checkAccess`)
+        const response = await fetch(baseURL + `/api/checkAccess`, options)
         if (response.ok) {
-            const data = await response.text()
-            jwtToken = data
+            const data = await response.json()
+            jwtToken = data.token
+            user = data.user
             return true
         }
     } catch (e) {
@@ -23,7 +25,7 @@ export async function checkAccess(birthdate: string, mail: string): Promise<bool
 }
 
 async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
-    const response = await fetch(baseURL + `/api/getFreeSlotsAt?date=${date.toISOString()}`)
+    const response = await fetch(baseURL + `/api/getfreeslotsat?date=${date.toISOString()}`)
     const data = await response.json()
     return data.freeSlots
 }

@@ -3,7 +3,7 @@
   import { checkAccess } from './lib/io';
   let email: string = '';
   let birthdate: string = '';
-  const hasAccess = false;
+  let hasAccess = false;
 </script>
 
 <main>
@@ -21,7 +21,9 @@
     type="text"
     placeholder="Ihr Geburtsdatum"
     bind:value={birthdate}
-    onblur={() => checkAccess(birthdate, email)} />
+    onblur={async () => {
+      hasAccess = await checkAccess(birthdate, email);
+    }} />
 
   <button>Termin suchen</button>
 </main>
