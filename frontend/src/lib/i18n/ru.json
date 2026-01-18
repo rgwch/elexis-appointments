@@ -1,0 +1,21 @@
+{
+    "app_title": "Praxis Breite Запись",
+    "app_description": "Онлайн-запись на прием возможна только в том случае, если вы уже зарегистрированы в нашей системе и у нас есть ваш адрес электронной почты.",
+    "email_label": "Адрес электронной почты",
+    "email_placeholder": "ваш@email.com",
+    "birthdate_label": "Дата рождения",
+    "search_appointment": "Найти запись",
+    "checking": "Проверка...",
+    "please_fill_all_fields": "Пожалуйста, заполните все поля",
+    "access_denied": "Доступ запрещен. Проверьте свои данные.",
+    "select_appointment": "Выбрать запись",
+    "select_date": "Выберите дату:",
+    "loading": "Загрузка...",
+    "no_slots_available": "Нет свободных мест на эту дату",
+    "error_loading_slots": "Ошибка загрузки доступных мест",
+    "please_select_slot": "Пожалуйста, выберите время",
+    "appointment_booked": "Запись успешно забронирована!",
+    "error_booking": "Ошибка при бронировании записи",
+    "available_slots": "Доступные времена:",
+    "book_appointment": "Подтвердить бронирование"
+}

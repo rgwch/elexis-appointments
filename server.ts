@@ -16,13 +16,8 @@ server.addRoute("get", "/api/checkAccess", async (req, res) => {
 server.addRoute("get", "/api/getfreeslotsat", async (req, res) => {
     const params = server.getParams(req)
     const dateStr = params.get("date")
-    const id = params.get("id")
     if (!dateStr) {
         server.error(res, 400, "Missing date parameter")
-        return false
-    }
-    if (!id) {
-        server.error(res, 400, "Missing id parameter")
         return false
     }
     const date = new Date(dateStr)

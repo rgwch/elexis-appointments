@@ -48,6 +48,28 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
             }
         }
     }
+    const maxPerDay = parseInt(process.env.maxPerDay || "5");
+    if (freeSlots.size > maxPerDay) {
+        const slotsArray = Array.from(freeSlots);
+        const earliest = slotsArray[0];
+        const latest = slotsArray[slotsArray.length - 1];
+
+        // Select random slots from the middle
+        const middle = slotsArray.slice(1, -1);
+        const numMiddle = maxPerDay - 2;
+        const selected = new Set<number>([earliest, latest].filter((n): n is number => n !== undefined));
+
+        for (let i = 0; i < numMiddle && i < middle.length; i++) {
+            const randomIndex = Math.floor(Math.random() * middle.length);
+            const slot = middle[randomIndex];
+            if (slot !== undefined) {
+                selected.add(slot);
+            }
+            middle.splice(randomIndex, 1);
+        }
+
+        return new Set(Array.from(selected).sort((a, b) => a - b));
+    }
     return freeSlots;
 }
 
@@ -80,9 +102,9 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
     if (!birthdate || birthdate === "") return Promise.resolve(null)
     if (!mail || mail === "") return Promise.resolve(null)
     const db = new SQL(process.env.database!)
-    const dat = (birthdate || "01.01").split(".")
+    const dat = (birthdate || "01-01").split("-")
     if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
-    const elexisdate = dat[2].padStart(4, '0') + dat[1].padStart(2, '0') + dat[0].padStart(2, '0')
+    const elexisdate = dat[0] + dat[1] + dat[2]
 
     const results = await db`
         SELECT * FROM kontakt 

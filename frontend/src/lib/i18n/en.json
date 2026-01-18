@@ -1,0 +1,21 @@
+{
+    "app_title": "Praxis Breite Appointments",
+    "app_description": "Online appointment booking is only possible if you are already registered in our system and we have your email address.",
+    "email_label": "Email Address",
+    "email_placeholder": "your@email.com",
+    "birthdate_label": "Date of Birth",
+    "search_appointment": "Search Appointment",
+    "checking": "Checking...",
+    "please_fill_all_fields": "Please fill in both fields",
+    "access_denied": "Access denied. Please check your information.",
+    "select_appointment": "Select Appointment",
+    "select_date": "Select a date:",
+    "loading": "Loading...",
+    "no_slots_available": "No free appointments available for this date",
+    "error_loading_slots": "Error loading available appointments",
+    "please_select_slot": "Please select a time slot",
+    "appointment_booked": "Appointment successfully booked!",
+    "error_booking": "Error booking appointment",
+    "available_slots": "Available Time Slots:",
+    "book_appointment": "Confirm Booking"
+}

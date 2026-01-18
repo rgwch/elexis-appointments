@@ -1,0 +1,21 @@
+{
+    "app_title": "Praxis Breite Rendez-vous",
+    "app_description": "La prise de rendez-vous en ligne n'est possible que si vous êtes déjà enregistré dans notre système et que nous disposons de votre adresse e-mail.",
+    "email_label": "Adresse e-mail",
+    "email_placeholder": "votre@email.com",
+    "birthdate_label": "Date de naissance",
+    "search_appointment": "Rechercher un rendez-vous",
+    "checking": "Vérification...",
+    "please_fill_all_fields": "Veuillez remplir tous les champs",
+    "access_denied": "Accès refusé. Veuillez vérifier vos informations.",
+    "select_appointment": "Sélectionner un rendez-vous",
+    "select_date": "Sélectionner une date :",
+    "loading": "Chargement...",
+    "no_slots_available": "Aucun créneau disponible pour cette date",
+    "error_loading_slots": "Erreur lors du chargement des créneaux disponibles",
+    "please_select_slot": "Veuillez sélectionner un créneau horaire",
+    "appointment_booked": "Rendez-vous réservé avec succès !",
+    "error_booking": "Erreur lors de la réservation du rendez-vous",
+    "available_slots": "Créneaux disponibles :",
+    "book_appointment": "Confirmer la réservation"
+}

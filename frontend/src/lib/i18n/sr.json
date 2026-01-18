@@ -1,0 +1,21 @@
+{
+    "app_title": "Praxis Breite Termini",
+    "app_description": "Zakazivanje termina putem interneta je moguće samo ako ste već registrovani u našem sistemu i ako imamo vašu email adresu.",
+    "email_label": "Email adresa",
+    "email_placeholder": "vasa@email.com",
+    "birthdate_label": "Datum rođenja",
+    "search_appointment": "Pretraži termin",
+    "checking": "Proveravam...",
+    "please_fill_all_fields": "Molimo popunite sva polja",
+    "access_denied": "Pristup odbijen. Proverite vaše podatke.",
+    "select_appointment": "Izaberite termin",
+    "select_date": "Izaberite datum:",
+    "loading": "Učitavanje...",
+    "no_slots_available": "Nema slobodnih termina za ovaj datum",
+    "error_loading_slots": "Greška pri učitavanju dostupnih termina",
+    "please_select_slot": "Molimo izaberite vreme",
+    "appointment_booked": "Termin uspešno zakazan!",
+    "error_booking": "Greška pri zakazivanju termina",
+    "available_slots": "Dostupni termini:",
+    "book_appointment": "Potvrdi zakazivanje"
+}

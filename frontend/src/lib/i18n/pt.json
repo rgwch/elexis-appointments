@@ -1,0 +1,21 @@
+{
+    "app_title": "Praxis Breite Agendamentos",
+    "app_description": "O agendamento online só é possível se você já estiver registrado em nosso sistema e tivermos seu endereço de e-mail.",
+    "email_label": "Endereço de e-mail",
+    "email_placeholder": "seu@email.com",
+    "birthdate_label": "Data de nascimento",
+    "search_appointment": "Buscar consulta",
+    "checking": "Verificando...",
+    "please_fill_all_fields": "Por favor, preencha todos os campos",
+    "access_denied": "Acesso negado. Verifique suas informações.",
+    "select_appointment": "Selecionar consulta",
+    "select_date": "Selecione uma data:",
+    "loading": "Carregando...",
+    "no_slots_available": "Nenhum horário disponível para esta data",
+    "error_loading_slots": "Erro ao carregar horários disponíveis",
+    "please_select_slot": "Por favor, selecione um horário",
+    "appointment_booked": "Consulta agendada com sucesso!",
+    "error_booking": "Erro ao agendar consulta",
+    "available_slots": "Horários disponíveis:",
+    "book_appointment": "Confirmar agendamento"
+}

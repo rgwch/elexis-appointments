@@ -1,0 +1,21 @@
+{
+    "app_title": "Praxis Breite Appuntamenti",
+    "app_description": "La prenotazione online degli appuntamenti è possibile solo se sei già registrato nel nostro sistema e abbiamo il tuo indirizzo email.",
+    "email_label": "Indirizzo email",
+    "email_placeholder": "tua@email.com",
+    "birthdate_label": "Data di nascita",
+    "search_appointment": "Cerca appuntamento",
+    "checking": "Verifica in corso...",
+    "please_fill_all_fields": "Si prega di compilare tutti i campi",
+    "access_denied": "Accesso negato. Controlla le tue informazioni.",
+    "select_appointment": "Seleziona appuntamento",
+    "select_date": "Seleziona una data:",
+    "loading": "Caricamento...",
+    "no_slots_available": "Nessuno slot disponibile per questa data",
+    "error_loading_slots": "Errore nel caricamento degli slot disponibili",
+    "please_select_slot": "Si prega di selezionare uno slot orario",
+    "appointment_booked": "Appuntamento prenotato con successo!",
+    "error_booking": "Errore nella prenotazione dell'appuntamento",
+    "available_slots": "Slot disponibili:",
+    "book_appointment": "Conferma prenotazione"
+}
