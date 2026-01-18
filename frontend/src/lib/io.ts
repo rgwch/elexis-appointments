@@ -3,7 +3,14 @@ let jwtToken: string | null = null
 
 export async function checkAccess(birthdate: string, mail: string): Promise<boolean> {
     try {
-        const response = await fetch(baseURL + `/api/checkAccess?birthdate=${encodeURIComponent(birthdate)}&mail=${encodeURIComponent(mail)}`)
+        const options = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ birthdate, mail })
+        }
+        const response = await fetch(baseURL + `/api/checkAccess`)
         if (response.ok) {
             const data = await response.text()
             jwtToken = data
