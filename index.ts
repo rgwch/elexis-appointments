@@ -1,7 +1,13 @@
 import "dotenv/config"
 import { sql, SQL } from "bun"
 
-async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
+export type user = {
+    id: string
+    lastname: string
+    firstname: string
+    mail: string
+}
+export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
     const db = new SQL(process.env.database!)
     const day = date.getDate()
     const month = date.getMonth() + 1
@@ -11,7 +17,7 @@ async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
         SELECT * FROM agntermine 
         WHERE tag=${elexisdate} AND deleted="0" AND bereich=${process.env.bereich || "Arzt"}
     `;
-    console.log(`Found ${results.length} appointments on ${elexisdate}`);
+    // console.log(`Found ${results.length} free slots on ${elexisdate}`);
     // console.log(results);
     const takenSlots = new Set<number>();
     results.forEach((termin: any) => {
@@ -28,7 +34,7 @@ async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
 
     for (let minute = workStart; minute < workEnd; minute++) {
         if (!takenSlots.has(minute)) {
-            // Check if we have at least 30 consecutive free minutes
+            // Check if we have at least minFreeMMinutes consecutive free minutes
             let isFree = true;
             for (let j = 0; j < parseInt(process.env.minFreeMinutes || "30"); j++) {
                 if (takenSlots.has(minute + j)) {
@@ -45,24 +51,52 @@ async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
     return freeSlots;
 }
 
-function checkAccess(birthdate: string, mail: string): Promise<boolean> {
+export async function takeSlot(startMinute: number, duration: number, patId: string): Promise<string> {
     const db = new SQL(process.env.database!)
-    const dat = (birthdate || "01.01").split(".")
-    if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(false)
-    const elexisdate = dat[2].padStart(4, '0') + dat[1].padStart(2, '0') + dat[0].padStart(2, '0')
-
-    return db`
-        SELECT * FROM kontakt 
-        WHERE geburtsdatum=${elexisdate} AND email=${mail}
-    `.then(results => {
-        return results.length > 0;
-    });
+    const now = new Date()
+    const elexisdate = now.getFullYear().toString().padStart(4, '0') +
+        (now.getMonth()).toString().padStart(2, '0') +
+        now.getDate().toString().padStart(2, '0')
+    const palmid =
+        Math.random().toString(36).substring(2, 10)
+    await db`
+        INSERT INTO agnte   rmine (bereich, tag, beginn, dauer, deleted, palmid, patid) 
+        VALUES (${process.env.bereich || "Arzt"}, ${elexisdate}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId})
+    `
+    console.log(`Booked slot at ${startMinute} for ${duration} minutes on ${elexisdate}`);
+    return palmid;
 }
 
-getFreeSlotsAt(new Date(2026, 1, 7)).then(results => {
-    console.log(results)
-});
-checkAccess("1.2.1950", "testperson@elexis.ch").then(access => {
-    console.log("Access:", access)
-    process.exit(0)
-});
+export async function deleteAppointment(palmid: string, patid: string): Promise<void> {
+    const db = new SQL(process.env.database!)
+    await db`
+        DELETE FROM agntermine WHERE palmid=${palmid} AND patid=${patid}
+    `
+    console.log(`Deleted appointment with palmid ${palmid}`);
+
+}
+
+export async function checkAccess(birthdate: string | null, mail: string | null): Promise<user | null> {
+    if (!birthdate || birthdate === "") return Promise.resolve(null)
+    if (!mail || mail === "") return Promise.resolve(null)
+    const db = new SQL(process.env.database!)
+    const dat = (birthdate || "01.01").split(".")
+    if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
+    const elexisdate = dat[2].padStart(4, '0') + dat[1].padStart(2, '0') + dat[0].padStart(2, '0')
+
+    const results = await db`
+        SELECT * FROM kontakt 
+        WHERE geburtsdatum=${elexisdate} AND email=${mail}
+    `;
+    if (results.length > 0) {
+        return {
+            id: results[0].id,
+            lastname: results[0].bezeichnung1,
+            firstname: results[0].bezeichnung2,
+            mail
+        };
+    }
+    return null;
+}
+
+import './server'

@@ -10,6 +10,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@rgwch/mikrorest": "^0.8.1",
     "dotenv": "^17.2.3"
   }
 }
