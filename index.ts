@@ -79,11 +79,12 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
     const db = new SQL(process.env.database!)
     const palmid =
         Math.floor(Math.random() * 2147483640)
+    const currentTime = Math.round(new Date().getTime() / 60000).toString();
     try {
         await db`
         INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, palmid, patid,angelegt,erstelltvon) 
         VALUES (${Math.random().toString(36).substring(2, 10)}, ${process.env.bereich || "Arzt"}, 
-        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${elexisdateFromDate(new Date())}, "internet")
+        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${currentTime}, "internet")
     `
         return palmid.toString(20);
     } catch (e) {

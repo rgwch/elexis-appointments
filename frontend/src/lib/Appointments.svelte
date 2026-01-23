@@ -13,6 +13,7 @@
     let loading: boolean = false;
     let message: string = '';
     let navigating: boolean = false;
+    let booked: boolean = false;
 
     // Set minimum date to today
     const today = new Date();
@@ -110,6 +111,7 @@
                 freeSlots = [];
                 selectedSlot = null;
                 selectedDate = '';
+                booked = true;
             } else {
                 message = $_('error_booking');
             }
@@ -123,70 +125,72 @@
 </script>
 
 <div class="appointments-container">
-    <h2>📅 {$_('select_appointment')}</h2>
+    {#if !booked}
+        <h2>{$_('select_appointment')}</h2>
 
-    <div class="date-selector">
-        <label for="date">
-            <svg
-                class="input-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                style="width: 18px; height: 18px; margin-right: 0.5rem; color: #667eea;">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            {$_('select_date')}
-        </label>
-        <div class="date-input-container">
-            <button
-                type="button"
-                class="nav-button nav-prev"
-                on:click={navigateToPrevDate}
-                disabled={loading || navigating || !selectedDate}
-                title="Previous available date">
+        <div class="date-selector">
+            <label for="date">
                 <svg
+                    class="input-icon"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"></polyline>
+                    stroke-width="2"
+                    style="width: 18px; height: 18px; margin-right: 0.5rem; color: #667eea;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"
+                    ></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-            </button>
-            <input
-                type="date"
-                id="date"
-                bind:value={selectedDate}
-                on:change={handleDateChange}
-                min={minDate}
-                disabled={loading || navigating} />
-            <button
-                type="button"
-                class="nav-button nav-next"
-                on:click={navigateToNextDate}
-                disabled={loading || navigating}
-                title="Next available date">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            </button>
+                {$_('select_date')}
+            </label>
+            <div class="date-input-container">
+                <button
+                    type="button"
+                    class="nav-button nav-prev"
+                    on:click={navigateToPrevDate}
+                    disabled={loading || navigating || !selectedDate}
+                    title="Previous available date">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <input
+                    type="date"
+                    id="date"
+                    bind:value={selectedDate}
+                    on:change={handleDateChange}
+                    min={minDate}
+                    disabled={loading || navigating} />
+                <button
+                    type="button"
+                    class="nav-button nav-next"
+                    on:click={navigateToNextDate}
+                    disabled={loading || navigating}
+                    title="Next available date">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
         </div>
-    </div>
 
-    {#if loading}
-        <p class="loading">{$_('loading')}</p>
+        {#if loading}
+            <p class="loading">{$_('loading')}</p>
+        {/if}
     {/if}
-
     {#if message}
         <p
             class="message"
@@ -194,6 +198,14 @@
                 message.includes('Failed')}
             class:success={message.includes('successfully')}>
             {message}
+        </p>
+    {/if}
+    {#if booked}
+        <p class="message success">
+            {$_('appointment_explanation')}
+        </p>
+        <p class="message success">
+            {$_('ask_for_mail')}
         </p>
     {/if}
 
