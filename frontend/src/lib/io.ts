@@ -70,7 +70,7 @@ export const findPrevPossibleDate = async (startDate: Date): Promise<Date> => {
     throw new Error("No available dates in the previous 30 days")
 }
 
-export async function bookAppointment(date: Date, startMinute: number, duration: number): Promise<boolean> {
+export async function bookAppointment(date: Date, startMinute: number, duration: number): Promise<string> {
     const headers = createHeader()
     const body = {
         date: date.toISOString(),
@@ -84,5 +84,9 @@ export async function bookAppointment(date: Date, startMinute: number, duration:
         body: JSON.stringify(body)
     }
     const response = await fetch(baseURL + `/api/takeslot`, options)
-    return response.ok
+    const data = await response.json()
+    if (data.success !== true) {
+        throw new Error("Booking failed")
+    }
+    return data.slotID
 }

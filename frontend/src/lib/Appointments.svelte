@@ -104,7 +104,9 @@
             );
 
             if (success) {
-                message = $_('appointment_booked');
+                message = $_('appointment_booked', {
+                    values: { slotID: success },
+                });
                 freeSlots = [];
                 selectedSlot = null;
                 selectedDate = '';
