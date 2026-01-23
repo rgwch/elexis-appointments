@@ -7,15 +7,17 @@ export type user = {
     firstname: string
     mail: string
 }
-export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
-    const db = new SQL(process.env.database!)
+function elexisdateFromDate(date: Date): string {
     const day = date.getDate()
     const month = date.getMonth() + 1
     const year = date.getFullYear()
-    const elexisdate = year.toString().padStart(4, '0') + (month).toString().padStart(2, '0') + day.toString().padStart(2, '0')
+    return year.toString().padStart(4, '0') + (month).toString().padStart(2, '0') + day.toString().padStart(2, '0')
+}
+export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
+    const db = new SQL(process.env.database!)
     const results = await db`
         SELECT * FROM agntermine 
-        WHERE tag=${elexisdate} AND deleted="0" AND bereich=${process.env.bereich || "Arzt"}
+        WHERE tag=${elexisdateFromDate(date)} AND deleted="0" AND bereich=${process.env.bereich || "Arzt"}
     `;
     // console.log(`Found ${results.length} free slots on ${elexisdate}`);
     // console.log(results);
@@ -75,19 +77,15 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
 
 export async function takeSlot(date: string, startMinute: number, duration: number, patId: string): Promise<string> {
     const db = new SQL(process.env.database!)
-    const now = new Date(date)
-    const elexisdate = now.getFullYear().toString().padStart(4, '0') +
-        (now.getMonth() + 1).toString().padStart(2, '0') +
-        now.getDate().toString().padStart(2, '0')
     const palmid =
-        Math.random().toString(36).substring(2, 10)
+        Math.floor(Math.random() * 2147483640)
     try {
         await db`
-        INSERT INTO agntermine (bereich, tag, beginn, dauer, deleted, palmid, patid) 
-        VALUES (${process.env.bereich || "Arzt"}, ${elexisdate}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId})
+        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, palmid, patid,angelegt,erstelltvon) 
+        VALUES (${Math.random().toString(36).substring(2, 10)}, ${process.env.bereich || "Arzt"}, 
+        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${elexisdateFromDate(new Date())}, "internet")
     `
-        console.log(`Booked slot at ${startMinute} for ${duration} minutes on ${elexisdate}`);
-        return palmid;
+        return palmid.toString(20);
     } catch (e) {
         console.error("Error booking slot:", e)
         throw e
