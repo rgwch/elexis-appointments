@@ -1,3 +1,4 @@
+import type { termin } from "../../../types.d"
 const port = import.meta.env.VITE_PORT || 3000
 export const baseURL = import.meta.env.DEV ? "http://localhost:" + port : ""
 let jwtToken: string | null = null
@@ -41,7 +42,7 @@ export async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
     return data.freeSlots
 }
 
-export async function findAppointments(): Promise<Array<{ date: string; startMinute: number; duration: number; id: string }>> {
+export async function findAppointments(): Promise<Array<termin>> {
     const headers = createHeader()
     const response = await fetch(baseURL + `/api/findappointments?patId=${user.id}`, { headers })
     const data = await response.json()

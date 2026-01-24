@@ -20,6 +20,6 @@
     "error_booking": "Fehler beim Buchen des Termins",
     "available_slots": "Verfügbare Zeitfenster:",
     "book_appointment": "Termin verbindlich buchen",
-    "remove_appointment": "Termin absagen",
+    "remove_appointment": "Termin anzeigen / absagen",
     "or": "...oder..."
 }
