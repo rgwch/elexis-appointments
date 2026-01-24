@@ -1,4 +1,5 @@
-export const baseURL = import.meta.env.DEV ? "http://localhost:3341" : ""
+const port=import.meta.env.VITE_PORT || 3000
+export const baseURL = import.meta.env.DEV ? "http://localhost:"+port : ""
 let jwtToken: string | null = null
 let user: any = null
 
