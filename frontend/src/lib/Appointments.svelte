@@ -201,10 +201,10 @@
         </p>
     {/if}
     {#if booked}
-        <p class="message success">
+        <p>
             {$_('appointment_explanation')}
         </p>
-        <p class="message success">
+        <p>
             {$_('ask_for_mail')}
         </p>
     {/if}

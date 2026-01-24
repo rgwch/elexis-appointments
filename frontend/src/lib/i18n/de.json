@@ -19,5 +19,7 @@
     "ask_for_mail": "Falls Sie eine Bestätigung des Termins per E-Mail wünschen, klicken Sie hier",
     "error_booking": "Fehler beim Buchen des Termins",
     "available_slots": "Verfügbare Zeitfenster:",
-    "book_appointment": "Termin verbindlich buchen"
+    "book_appointment": "Termin verbindlich buchen",
+    "remove_appointment": "Termin absagen",
+    "or": "...oder..."
 }

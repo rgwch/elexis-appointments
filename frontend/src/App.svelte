@@ -106,6 +106,16 @@
             {$_('search_appointment')}
           {/if}
         </button>
+        <div style="margin-top: 5px;">
+          <p>{$_('or')}</p>
+          <button
+            type="button"
+            class="cancel-btn"
+            disabled={checking}
+            on:click={() => (hasAccess = true)}>
+            {$_('remove_appointment')}
+          </button>
+        </div>
       </form>
     </main>
   {:else}
@@ -237,6 +247,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .cancel-btn {
+    background: #ea66ac;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
     gap: 0.5rem;
   }
 
