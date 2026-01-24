@@ -1,5 +1,6 @@
 <script lang="ts">
   import Appointments from './lib/Appointments.svelte';
+  import Remove from './lib/Remove.svelte';
   import { checkAccess } from './lib/io';
   import { _ } from 'svelte-i18n';
   let email: string = '';
@@ -7,6 +8,7 @@
   let hasAccess = false;
   let checking = false;
   let errorMsg = '';
+  let mode: 'view' | 'remove' = 'view';
 
   async function handleCheckAccess() {
     if (!email || !birthdate) {
@@ -109,15 +111,19 @@
         <div style="margin-top: 5px;">
           <p>{$_('or')}</p>
           <button
-            type="button"
+            type="submit"
             class="cancel-btn"
             disabled={checking}
-            on:click={() => (hasAccess = true)}>
+            on:click={() => {
+              mode = 'remove';
+            }}>
             {$_('remove_appointment')}
           </button>
         </div>
       </form>
     </main>
+  {:else if mode === 'remove'}
+    <Remove />
   {:else}
     <Appointments />
   {/if}

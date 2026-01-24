@@ -1,5 +1,5 @@
-const port=import.meta.env.VITE_PORT || 3000
-export const baseURL = import.meta.env.DEV ? "http://localhost:"+port : ""
+const port = import.meta.env.VITE_PORT || 3000
+export const baseURL = import.meta.env.DEV ? "http://localhost:" + port : ""
 let jwtToken: string | null = null
 let user: any = null
 
@@ -39,6 +39,13 @@ export async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
     const response = await fetch(baseURL + `/api/getfreeslotsat?date=${date.toISOString()}`, { headers })
     const data = await response.json()
     return data.freeSlots
+}
+
+export async function findAppointments(): Promise<Array<{ date: string; startMinute: number; duration: number; id: string }>> {
+    const headers = createHeader()
+    const response = await fetch(baseURL + `/api/findappointments?patId=${user.id}`, { headers })
+    const data = await response.json()
+    return data.appointments
 }
 
 export const findNextPossibleDate = async (startDate: Date): Promise<Date> => {

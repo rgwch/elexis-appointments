@@ -1,5 +1,5 @@
 import { MikroRest } from '@rgwch/mikrorest'
-import { checkAccess, deleteAppointment, getFreeSlotsAt, takeSlot } from "./index"
+import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, takeSlot } from "./index"
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
@@ -37,6 +37,18 @@ server.addRoute("post", "/api/takeslot", async (req, res) => {
     }
     const slotID = await takeSlot(date, startMinute, duration, patId)
     server.sendJson(res, { success: true, slotID: slotID })
+    return false
+})
+
+server.addRoute("get", "/api/findappointments", async (req, res) => {
+    const params = server.getParams(req)
+    const patId = params.get("patId")
+    if (!patId) {
+        server.error(res, 400, "Missing patId parameter")
+        return false
+    }
+    const appointments = await findAppointments(patId)
+    server.sendJson(res, { appointments: appointments })
     return false
 })
 

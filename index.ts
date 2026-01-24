@@ -90,9 +90,10 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
     const currentTime = Math.round(new Date().getTime() / 60000).toString();
     try {
         await db`
-        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, palmid, patid,angelegt,erstelltvon) 
+        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, palmid, patid,angelegt,erstelltvon, termintyp) 
         VALUES (${Math.random().toString(36).substring(2, 10)}, ${process.env.bereich || "Arzt"}, 
-        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${currentTime}, "internet")
+        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${currentTime}, 
+        "internet", ${process.env.TerminTyp || "Normal"})
     `
         return palmid.toString(20);
     } catch (e) {
@@ -112,6 +113,36 @@ export async function deleteAppointment(palmid: string, patid: string): Promise<
     db.close()
 }
 
+export async function findAppointments(patid: string): Promise<Array<{ date: string; startMinute: number; duration: number; id: string }>> {
+    const db = new SQL(process.env.database!)
+    try {
+        const appnts = await db`
+        SELECT * FROM agntermine 
+        WHERE patid=${patid} AND deleted="0" 
+        ORDER BY tag, beginn
+    `
+        const appointments: Array<{ date: string; startMinute: number; duration: number; id: string }> = []
+        for (const appnt of appnts) {
+            const year = parseInt(appnt.tag.substring(0, 4))
+            const month = parseInt(appnt.tag.substring(4, 6)) - 1
+            const day = parseInt(appnt.tag.substring(6, 8))
+            const date = new Date(year, month, day)
+            appointments.push({
+                date: date.toISOString().split('T')[0] || "",
+                startMinute: parseInt(appnt.beginn),
+                duration: parseInt(appnt.dauer),
+                id: appnt.palmid.toString(20),
+            })
+        }
+        return appointments;
+    } catch (e) {
+        console.error("Error finding appointments:", e)
+        db.close()
+        throw e
+    } finally {
+        db.close()
+    }
+}
 
 export async function checkAccess(birthdate: string | null, mail: string | null): Promise<user | null> {
     if (!birthdate || birthdate === "") return Promise.resolve(null)
