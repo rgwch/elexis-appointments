@@ -3,9 +3,8 @@
     let { mode = $bindable() } = $props();
 </script>
 
-<div>
-    <h2>{$_('select_appointment')}</h2>
-    <p>{$_('please_choose_option')}</p>
+<div class="card">
+    <p class="info-text">{$_('please_choose_option')}</p>
     <div class="options">
         <button class="option-btn" onclick={() => (mode = 'book')}>
             {$_('search_appointment')}
@@ -15,6 +14,7 @@
         </button>
     </div>
 </div>
+
 <style>
     .options {
         display: flex;
@@ -37,4 +37,4 @@
     .option-btn:hover {
         background-color: #434190;
     }
-</style>    
+</style>

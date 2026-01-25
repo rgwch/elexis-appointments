@@ -3,18 +3,15 @@
     import type { termin } from '../../../types.d';
     import { DateTime } from 'luxon';
     import { _ } from 'svelte-i18n';
-    import app from '../main';
     let { mode = $bindable() } = $props();
 
-
-    let selectedIds = $state(new Set<string>());
+    let selectedIds: Set<string> = $state(new Set<string>());
     let appointments: termin[] = $state([]);
     let loading = $state(false);
     let error: string = $state('');
 
-    function back(){
-        selectedIds.clear();
-        selectedIds = selectedIds;
+    function back() {
+        selectedIds = new Set(); // Create new Set to trigger reactivity
         loading = false;
         error = '';
         appointments = [];
@@ -29,12 +26,13 @@
     }
 
     function toggleSelection(id: string) {
-        if (selectedIds.has(id)) {
-            selectedIds.delete(id);
+        const newSet = new Set(selectedIds);
+        if (newSet.has(id)) {
+            newSet.delete(id);
         } else {
-            selectedIds.add(id);
+            newSet.add(id);
         }
-        selectedIds = selectedIds; // Trigger reactivity
+        selectedIds = newSet; // Create new Set to trigger reactivity
     }
 
     async function deleteSelected() {
@@ -43,8 +41,7 @@
             for (const id of selectedIds) {
                 await removeAppointment(id);
             }
-            selectedIds.clear();
-            selectedIds = selectedIds;
+            selectedIds = new Set(); // Create new Set to trigger reactivity
             await loadAppointments();
         } catch (e) {
             error =
@@ -66,15 +63,15 @@
             <p>{$_('noappointments')}</p>
         {:else}
             <p>{$_('select_appointments_to_remove')}</p>
-            <ul style="list-style-type: none; padding-left: 0;">
+            <ul class="slots-list">
                 {#each appointments as appointment}
                     <li>
                         <label>
                             <input
+                                style="margin-right: 0.5rem;"
                                 type="checkbox"
                                 checked={selectedIds.has(appointment.id)}
-                                onchange={() =>
-                                    toggleSelection(appointment.id)}
+                                onclick={() => toggleSelection(appointment.id)}
                                 disabled={loading} />
                             {DateTime.fromFormat(
                                 appointment.tag,
@@ -85,23 +82,22 @@
                     </li>
                 {/each}
             </ul>
-            <button
-                onclick={deleteSelected}
-                disabled={selectedIds.size === 0 || loading}>
-                {loading
-                    ? $_('cancelling')
-                    : selectedIds.size === 1
-                      ? $_('remove_selected_appointment')
-                      : $_('remove_selected_appointments', {
-                            values: { number: selectedIds.size },
-                        })}
+            <button onclick={deleteSelected} disabled={selectedIds.size === 0}>
+                {selectedIds.size === 1
+                    ? $_('remove_selected_appointment')
+                    : $_('remove_selected_appointments', {
+                          values: { number: selectedIds.size },
+                      })}
             </button>
         {/if}
         {#if error}
             <p style="color: red;">Error: {error}</p>
         {/if}
     {/await}
-     <button class="cancel-btn" onclick={back}>
-        {$_('book_another')}
-    </button>
+   
 </div>
+ <div>
+        <button class="cancel-btn" onclick={back}>
+            {$_('back_to_menu')}
+        </button>
+    </div>

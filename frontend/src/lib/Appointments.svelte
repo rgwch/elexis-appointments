@@ -251,7 +251,7 @@
         </div>
     {/if}
     <button class="cancel-btn" onclick={back}>
-        {$_('book_another')}
+        {$_('back_to_menu')}
     </button>
 </div>
 
@@ -398,94 +398,11 @@
         border-left: 4px solid #48bb78;
     }
 
-    .slots-container {
-        margin-top: 2rem;
-    }
-
     h3 {
         font-size: 1.25rem;
         font-weight: 600;
         color: #2d3748;
         margin-bottom: 1rem;
-    }
-
-    .slots-list {
-        list-style: none;
-        padding: 0;
-        margin-bottom: 1.5rem;
-        color: #091758;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-
-    .slots-list::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .slots-list::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-
-    .slots-list::-webkit-scrollbar-thumb {
-        background: #cbd5e0;
-        border-radius: 10px;
-    }
-
-    .slots-list::-webkit-scrollbar-thumb:hover {
-        background: #a0aec0;
-    }
-
-    .slots-list li {
-        margin-bottom: 0.4rem;
-        animation: fadeIn 0.3s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .slots-list label {
-        display: flex;
-        align-items: center;
-        padding: 0.8rem 1.25rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s;
-        background-color: white;
-    }
-
-    .slots-list label:hover {
-        border-color: #667eea;
-        background-color: #f7fafc;
-        transform: translateX(4px);
-    }
-
-    .slots-list input[type='radio'] {
-        width: 20px;
-        height: 20px;
-        margin-right: 1rem;
-        cursor: pointer;
-        accent-color: #667eea;
-    }
-
-    .slots-list label:has(input:checked) {
-        border-color: #667eea;
-        background: linear-gradient(
-            135deg,
-            rgba(102, 126, 234, 0.1) 0%,
-            rgba(118, 75, 162, 0.1) 100%
-        );
-        font-weight: 600;
-        color: #667eea;
     }
 
     .book-button {
