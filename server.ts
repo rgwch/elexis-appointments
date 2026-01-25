@@ -1,5 +1,5 @@
 import { MikroRest } from '@rgwch/mikrorest'
-import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, sendMail, takeSlot } from "./index"
+import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, sendMail, takeSlot, verifyToken } from "./index"
 import app from './frontend/src/main';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
@@ -22,6 +22,28 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
         return false
     } catch (e) {
         console.error("Error in /api/getfreeslotsat:", e)
+        server.error(res, 500, "Internal server error")
+        return false
+    }
+})
+
+server.addRoute("get", "/api/verifytoken", async (req, res) => {
+    const params = server.getParams(req)
+    const token = params.get("token")
+    if (!token) {
+        server.error(res, 400, "Missing token")
+        return false
+    }
+    try {
+        const user = await verifyToken(token) // implement in index.ts
+        if (user) {
+            const jwtToken = MikroRest.createJWT("", "", { verified: true })
+            server.sendJson(res, { token: jwtToken, user })
+        } else {
+            server.error(res, 401, "Invalid token")
+        }
+        return false
+    } catch (e) {
         server.error(res, 500, "Internal server error")
         return false
     }

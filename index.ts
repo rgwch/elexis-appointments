@@ -4,7 +4,7 @@ import { sql, SQL } from "bun"
 import { Mailer } from "./mailer"
 import ical from "ical-generator"
 
-const tokens: Map<string, string> = new Map<string, string>();
+const tokens: Map<string, { token: string, verified: boolean }> = new Map();
 function elexisdateFromDate(date: Date): string {
     const day = date.getDate()
     const month = date.getMonth() + 1
@@ -186,116 +186,130 @@ export async function sendToken(mail: string): Promise<void> {
             subject,
             contents
         )
-        tokens.set(mail, token);
+        tokens.set(mail, { token, verified: false });
         console.log(`Sent token email to ${mail}`);
     } catch (e) {
         console.error("Error sending token email:", e)
         throw e
     }
+}
 
-    export async function sendMail(id: string) {
-        const db = new SQL(process.env.database!)
-        try {
-            const results = await db`SELECT * from agntermine WHERE id=${id}`
-            if (results.length === 0) {
-                throw new Error("Appointment not found")
-            }
-            const appointment = results[0]
-            const patientResults = await db`SELECT * from kontakt WHERE id=${appointment.patid}`
-            if (patientResults.length === 0) {
-                throw new Error("Patient not found")
-            }
-            const patient = patientResults[0]
-            if (!patient.email || patient.email === "") {
-                throw new Error("Patient has no email")
-            }
-            console.log(`Sending email to ${patient.email} for appointment on ${appointment.tag} at ${appointment.beginn}`)
-            const mailer = new Mailer({
-                host: process.env.SMTP_SERVER,
-                port: parseInt(process.env.SMTP_PORT || "465"),
-                user: process.env.SMTP_USER,
-                pwd: process.env.SMTP_PASSWORD
-            }, process.env.MAIL_FROM || "")
-            const appointmentDate = new Date(
-                parseInt(appointment.tag.substring(0, 4)),
-                parseInt(appointment.tag.substring(4, 6)) - 1,
-                parseInt(appointment.tag.substring(6, 8)),
-                Math.floor(parseInt(appointment.beginn) / 60),
-                parseInt(appointment.beginn) % 60
-            )
-            const cal = ical({ "prodId": "elexis-appointments", "name": "Arzttermin" })
-            cal.createEvent({
-                start: appointmentDate,
-                end: new Date(appointmentDate.getTime() + 15 * 60000),
-                summary: "Arzttermin",
-                description: `Ihr Termin in der Praxis am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.`,
-                organizer: {
-                    name: "Praxis",
-                    email: process.env.MAIL_FROM || ""
-                }
-            })
-            const icalString = cal.toString()
-            const subject = `Terminbestätigung für ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr`
-            const contents = `Sehr geehrte/r ${patient.bezeichnung2} ${patient.bezeichnung1},\n\n` +
-                `hiermit bestätigen wir Ihren Termin am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.\n\n` +
-                `Bitte denken Sie daran, uns rechtzeitig zu informieren, falls Sie den Termin nicht wahrnehmen können.\n\n` +
-                `Freundliche Grüsse\nIhre Praxis`
-            const result = await mailer.send(
-                patient.email,
-                subject,
-                contents,
-                undefined,
-                icalString
-            )
-            console.log(`Email sent to ${patient.email} for appointment ${id}`);
-        } catch (e) {
-            console.error("Error sending mail:", e)
-            throw e
-        } finally {
-            db.close()
+export async function verifyToken(token: string): Promise<boolean> {
+    if (tokens.has(token)) {
+        const entry = tokens.get(token);
+        if (entry && entry.token === token) {
+            tokens.set(token, { token: entry.token, verified: true });
+            return true;
+
         }
     }
+    return false
+}
 
-    /**
-     * authorize method for the MikroRest server
-     * @param birthdate date as string in format YYYY-MM-DD
-     * @param mail string email address
-     * @returns the patient associated with the credentials or null if not found
-     */
-    export async function checkAccess(birthdate: string | null, mail: string | null): Promise<user | null> {
-        let db: SQL | null = null
-        try {
-            db = new SQL(process.env.database!)
+export async function sendMail(id: string) {
+    const db = new SQL(process.env.database!)
+    try {
+        const results = await db`SELECT * from agntermine WHERE id=${id}`
+        if (results.length === 0) {
+            throw new Error("Appointment not found")
+        }
+        const appointment = results[0]
+        const patientResults = await db`SELECT * from kontakt WHERE id=${appointment.patid}`
+        if (patientResults.length === 0) {
+            throw new Error("Patient not found")
+        }
+        const patient = patientResults[0]
+        if (!patient.email || patient.email === "") {
+            throw new Error("Patient has no email")
+        }
+        console.log(`Sending email to ${patient.email} for appointment on ${appointment.tag} at ${appointment.beginn}`)
+        const mailer = new Mailer({
+            host: process.env.SMTP_SERVER,
+            port: parseInt(process.env.SMTP_PORT || "465"),
+            user: process.env.SMTP_USER,
+            pwd: process.env.SMTP_PASSWORD
+        }, process.env.MAIL_FROM || "")
+        const appointmentDate = new Date(
+            parseInt(appointment.tag.substring(0, 4)),
+            parseInt(appointment.tag.substring(4, 6)) - 1,
+            parseInt(appointment.tag.substring(6, 8)),
+            Math.floor(parseInt(appointment.beginn) / 60),
+            parseInt(appointment.beginn) % 60
+        )
+        const cal = ical({ "prodId": "elexis-appointments", "name": "Arzttermin" })
+        cal.createEvent({
+            start: appointmentDate,
+            end: new Date(appointmentDate.getTime() + 15 * 60000),
+            summary: "Arzttermin",
+            description: `Ihr Termin in der Praxis am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.`,
+            organizer: {
+                name: "Praxis",
+                email: process.env.MAIL_FROM || ""
+            }
+        })
+        const icalString = cal.toString()
+        const subject = `Terminbestätigung für ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr`
+        const contents = `Sehr geehrte/r ${patient.bezeichnung2} ${patient.bezeichnung1},\n\n` +
+            `hiermit bestätigen wir Ihren Termin am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.\n\n` +
+            `Bitte denken Sie daran, uns rechtzeitig zu informieren, falls Sie den Termin nicht wahrnehmen können.\n\n` +
+            `Freundliche Grüsse\nIhre Praxis`
+        const result = await mailer.send(
+            patient.email,
+            subject,
+            contents,
+            undefined,
+            icalString
+        )
+        console.log(`Email sent to ${patient.email} for appointment ${id}`);
+    } catch (e) {
+        console.error("Error sending mail:", e)
+        throw e
+    } finally {
+        db.close()
+    }
+}
 
-            if (!birthdate || birthdate === "") return Promise.resolve(null)
-            if (!mail || mail === "") return Promise.resolve(null)
-            const dat = (birthdate || "01-01").split("-")
-            if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
-            if (!/^\d+$/.test(dat[0]) || !/^\d+$/.test(dat[1]) || !/^\d+$/.test(dat[2])) return Promise.resolve(null)
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return Promise.resolve(null)
-            if (/[\/\\'";]/.test(mail)) return Promise.resolve(null)
-            const elexisdate = dat[0] + dat[1] + dat[2]
-            const results = await db`
+
+/**
+ * authorize method for the MikroRest server
+ * @param birthdate date as string in format YYYY-MM-DD
+ * @param mail string email address
+ * @returns the patient associated with the credentials or null if not found
+ */
+export async function checkAccess(birthdate: string | null, mail: string | null): Promise<user | null> {
+    let db: SQL | null = null
+    try {
+        db = new SQL(process.env.database!)
+
+        if (!birthdate || birthdate === "") return Promise.resolve(null)
+        if (!mail || mail === "") return Promise.resolve(null)
+        const dat = (birthdate || "01-01").split("-")
+        if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
+        if (!/^\d+$/.test(dat[0]) || !/^\d+$/.test(dat[1]) || !/^\d+$/.test(dat[2])) return Promise.resolve(null)
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return Promise.resolve(null)
+        if (/[\/\\'";]/.test(mail)) return Promise.resolve(null)
+        const elexisdate = dat[0] + dat[1] + dat[2]
+        const results = await db`
         SELECT * FROM kontakt 
         WHERE geburtsdatum = ${elexisdate} AND email = ${mail}
         `;
-            if (results.length > 0) {
-                return {
-                    id: results[0].id,
-                    lastname: results[0].bezeichnung1,
-                    firstname: results[0].bezeichnung2,
-                    mail
-                };
-            }
-            return null;
-        } catch (e) {
-            console.error("Error checking access:", e)
-            return null
-        } finally {
-            db?.close()
+        if (results.length > 0) {
+            return {
+                id: results[0].id,
+                lastname: results[0].bezeichnung1,
+                firstname: results[0].bezeichnung2,
+                mail
+            };
         }
-
+        return null;
+    } catch (e) {
+        console.error("Error checking access:", e)
+        return null
+    } finally {
+        db?.close()
     }
 
+}
 
-    import './server'
+
+import './server'

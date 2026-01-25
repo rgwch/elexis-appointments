@@ -16,6 +16,21 @@ export function formatTime(minutes: number): string {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 }
 
+export async function verifyEmailToken(token: string): Promise<boolean> {
+    try {
+        const response = await fetch(baseURL + `/api/verifytoken?token=${token}`)
+        if (response.ok) {
+            const data = await response.json()
+            jwtToken = data.token
+            user = data.user
+            return true
+        }
+    } catch (e) {
+        console.error("Error during token verification:", e)
+    }
+    return false
+}
+
 export async function checkAccess(birthdate: string, mail: string): Promise<boolean> {
     try {
         const options = {

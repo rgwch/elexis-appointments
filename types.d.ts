@@ -12,4 +12,5 @@ export type user = {
     lastname: string
     firstname: string
     mail: string
+    verified: boolean
 }

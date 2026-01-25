@@ -5,11 +5,28 @@
   import Select from './lib/Select.svelte';
   import { _ } from 'svelte-i18n';
   import { onMount } from 'svelte';
+  import { verifyEmailToken } from './lib/io';
   let hasAccess = false;
   let mode: 'login' | 'select' | 'book' | 'display' = 'login';
   if (window.location.pathname.startsWith('/manage/')) {
     mode = 'display';
   }
+  onMount(async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (token) {
+      const success = await verifyEmailToken(token);
+      if (success) {
+        // Clear token from URL
+        window.history.replaceState({}, '', window.location.pathname);
+        // Set your app state to logged in
+        mode = 'display';
+      } else {
+        // Handle invalid token
+      }
+    }
+  });
 </script>
 
 <div class="app-container">
