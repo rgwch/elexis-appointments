@@ -9,13 +9,15 @@
     import { _ } from 'svelte-i18n';
     import { DateTime } from 'luxon';
 
-    let selectedDate: string = '';
-    let freeSlots: Array<number> = [];
-    let selectedSlot: number | null = null;
-    let loading: boolean = false;
-    let message: string = '';
-    let navigating: boolean = false;
-    let booked: boolean = false;
+    let { mode = $bindable() } = $props();
+
+    let selectedDate: string = $state('');
+    let freeSlots: Array<number> = $state([]);
+    let selectedSlot: number | null = $state(null);
+    let loading: boolean = $state(false);
+    let message: string = $state('');
+    let navigating: boolean = $state(false);
+    let booked: boolean = $state(false);
 
     // Set minimum date to today
     const today = new Date();
@@ -124,9 +126,19 @@
             loading = false;
         }
     }
+    function back() {
+        selectedDate = '';
+        freeSlots = [];
+        selectedSlot = null;
+        loading = false;
+        message = '';
+        navigating = false;
+        booked = false;
+        mode = 'select';
+    }
 </script>
 
-<div class="appointments-container">
+<div class="card">
     {#if !booked}
         <h2>{$_('select_appointment')}</h2>
 
@@ -152,7 +164,7 @@
                 <button
                     type="button"
                     class="nav-button nav-prev"
-                    on:click={navigateToPrevDate}
+                    onclick={navigateToPrevDate}
                     disabled={loading || navigating || !selectedDate}
                     title="Previous available date">
                     <svg
@@ -168,13 +180,13 @@
                     type="date"
                     id="date"
                     bind:value={selectedDate}
-                    on:change={handleDateChange}
+                    onchange={handleDateChange}
                     min={minDate}
                     disabled={loading || navigating} />
                 <button
                     type="button"
                     class="nav-button nav-next"
-                    on:click={navigateToNextDate}
+                    onclick={navigateToNextDate}
                     disabled={loading || navigating}
                     title="Next available date">
                     <svg
@@ -204,10 +216,10 @@
         </p>
     {/if}
     {#if booked}
-        <p>
+        <p class="info-text">
             {$_('appointment_explanation')}
         </p>
-        <p>
+        <p class="info-text">
             {$_('ask_for_mail')}
         </p>
     {/if}
@@ -232,25 +244,18 @@
 
             <button
                 class="book-button"
-                on:click={handleBooking}
+                onclick={handleBooking}
                 disabled={selectedSlot === null || loading}>
                 ✓ {$_('book_appointment')}
             </button>
         </div>
     {/if}
+    <button class="cancel-btn" onclick={back}>
+        {$_('book_another')}
+    </button>
 </div>
 
 <style>
-    .appointments-container {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        padding: 3rem;
-        max-width: 600px;
-        margin: 0 auto;
-        animation: slideUp 0.4s ease-out;
-    }
-
     @keyframes slideUp {
         from {
             opacity: 0;
@@ -367,6 +372,7 @@
         margin: 1rem 0;
         font-weight: 500;
         animation: slideDown 0.3s ease-out;
+        color: black;
     }
 
     @keyframes slideDown {
@@ -407,6 +413,7 @@
         list-style: none;
         padding: 0;
         margin-bottom: 1.5rem;
+        color: #091758;
         max-height: 300px;
         overflow-y: auto;
     }
@@ -430,7 +437,7 @@
     }
 
     .slots-list li {
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.4rem;
         animation: fadeIn 0.3s ease-out;
     }
 
@@ -448,7 +455,7 @@
     .slots-list label {
         display: flex;
         align-items: center;
-        padding: 1rem 1.25rem;
+        padding: 0.8rem 1.25rem;
         border: 2px solid #e2e8f0;
         border-radius: 10px;
         cursor: pointer;
@@ -507,15 +514,5 @@
         background: #cbd5e0;
         cursor: not-allowed;
         box-shadow: none;
-    }
-
-    @media (max-width: 640px) {
-        .appointments-container {
-            padding: 2rem 1.5rem;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-        }
     }
 </style>

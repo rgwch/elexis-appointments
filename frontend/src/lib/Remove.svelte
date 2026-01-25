@@ -3,12 +3,23 @@
     import type { termin } from '../../../types.d';
     import { DateTime } from 'luxon';
     import { _ } from 'svelte-i18n';
+    import app from '../main';
+    let { mode = $bindable() } = $props();
 
-    let selectedIds = new Set<string>();
-    let appointments: termin[] = [];
-    let loading = false;
-    let error: string = '';
 
+    let selectedIds = $state(new Set<string>());
+    let appointments: termin[] = $state([]);
+    let loading = $state(false);
+    let error: string = $state('');
+
+    function back(){
+        selectedIds.clear();
+        selectedIds = selectedIds;
+        loading = false;
+        error = '';
+        appointments = [];
+        mode = 'select';
+    }
     async function loadAppointments() {
         try {
             appointments = await findAppointments();
@@ -46,7 +57,7 @@
     }
 </script>
 
-<div>
+<div class="card">
     <h1>{$_('yourappointments')}</h1>
     {#await loadAppointments()}
         <p>{$_('loading')}</p>
@@ -62,7 +73,7 @@
                             <input
                                 type="checkbox"
                                 checked={selectedIds.has(appointment.id)}
-                                on:change={() =>
+                                onchange={() =>
                                     toggleSelection(appointment.id)}
                                 disabled={loading} />
                             {DateTime.fromFormat(
@@ -75,7 +86,7 @@
                 {/each}
             </ul>
             <button
-                on:click={deleteSelected}
+                onclick={deleteSelected}
                 disabled={selectedIds.size === 0 || loading}>
                 {loading
                     ? $_('cancelling')
@@ -90,4 +101,7 @@
             <p style="color: red;">Error: {error}</p>
         {/if}
     {/await}
+     <button class="cancel-btn" onclick={back}>
+        {$_('book_another')}
+    </button>
 </div>

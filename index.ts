@@ -95,15 +95,13 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
  */
 export async function takeSlot(date: string, startMinute: number, duration: number, patId: string): Promise<termin> {
     const db = new SQL(process.env.database!)
-    const palmid =
-        Math.floor(Math.random() * 2147483640)
     const currentTime = Math.round(new Date().getTime() / 60000).toString();
     const id = Math.random().toString(36).substring(2, 10);
     try {
         const result = await db`
-        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, palmid, patid,angelegt,erstelltvon, termintyp) 
+        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, patid,angelegt,erstelltvon, termintyp) 
         VALUES (${id}, ${process.env.bereich || "Arzt"}, 
-        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${currentTime}, 
+        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${patId} , ${currentTime}, 
         "internet", ${process.env.TerminTyp || "Normal"})
     `
         return {
