@@ -13,6 +13,8 @@ server.addRoute("get", "/api/checkAccess", async (req, res) => {
     return false
 })
 */
+
+server.addStaticDir("./frontend/dist")
 server.addRoute("get", "/api/getfreeslotsat", async (req, res) => {
     const params = server.getParams(req)
     const dateStr = params.get("date")
@@ -70,7 +72,8 @@ server.addRoute("post", "/api/deleteappointment", async (req, res) => {
 })
 server.handleLogin("/api/checkaccess", async (birthdate, mail) => {
     console.log("checkAccess called with", birthdate, mail)
-    return checkAccess(birthdate, mail)
+    const acc=await checkAccess(birthdate, mail)
+    return acc
 })
 console.log("listening on port", port)
 server.start()

@@ -119,8 +119,9 @@ export async function deleteAppointment(palmid: string, patid: string): Promise<
 }
 
 export async function findAppointments(patid: string): Promise<Array<termin>> {
-    const db = new SQL(process.env.database!)
+    let db: SQL | null = null
     try {
+        db = new SQL(process.env.database!)
         const appnts = await db`
         SELECT * FROM agntermine 
         WHERE patid=${patid} AND deleted="0" 
@@ -145,35 +146,43 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
         return appointments;
     } catch (e) {
         console.error("Error finding appointments:", e)
-        db.close()
         throw e
     } finally {
-        db.close()
+        db?.close()
     }
 }
 
 export async function checkAccess(birthdate: string | null, mail: string | null): Promise<user | null> {
-    if (!birthdate || birthdate === "") return Promise.resolve(null)
-    if (!mail || mail === "") return Promise.resolve(null)
-    const dat = (birthdate || "01-01").split("-")
-    if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
-    const elexisdate = dat[0] + dat[1] + dat[2]
+    let db: SQL | null = null
+    try {
+        db = new SQL(process.env.database!)
 
-    const db = new SQL(process.env.database!)
-    const results = await db`
+        if (!birthdate || birthdate === "") return Promise.resolve(null)
+        if (!mail || mail === "") return Promise.resolve(null)
+        const dat = (birthdate || "01-01").split("-")
+        if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
+        const elexisdate = dat[0] + dat[1] + dat[2]
+
+        const results = await db`
         SELECT * FROM kontakt 
         WHERE geburtsdatum=${elexisdate} AND email=${mail}
     `;
-    db.close()
-    if (results.length > 0) {
-        return {
-            id: results[0].id,
-            lastname: results[0].bezeichnung1,
-            firstname: results[0].bezeichnung2,
-            mail
-        };
+        if (results.length > 0) {
+            return {
+                id: results[0].id,
+                lastname: results[0].bezeichnung1,
+                firstname: results[0].bezeichnung2,
+                mail
+            };
+        }
+        return null;
+    } catch (e) {
+        console.error("Error checking access:", e)
+        return null
+    } finally {
+        db?.close()
     }
-    return null;
+
 }
 
 import './server'
