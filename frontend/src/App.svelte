@@ -3,10 +3,13 @@
   import Login from './lib/Login.svelte';
   import Remove from './lib/Remove.svelte';
   import Select from './lib/Select.svelte';
-  import { checkAccess } from './lib/io';
   import { _ } from 'svelte-i18n';
+  import { onMount } from 'svelte';
   let hasAccess = false;
   let mode: 'login' | 'select' | 'book' | 'display' = 'login';
+  if (window.location.pathname.startsWith('/manage/')) {
+    mode = 'display';
+  }
 </script>
 
 <div class="app-container">
