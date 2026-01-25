@@ -9,6 +9,12 @@ function elexisdateFromDate(date: Date): string {
     const year = date.getFullYear()
     return year.toString().padStart(4, '0') + (month).toString().padStart(2, '0') + day.toString().padStart(2, '0')
 }
+
+/**
+ * Get the free slots at a given date
+ * @param date 
+ * @returns A Set of numbers representing the free slots in minutes from midnight
+ */
 export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
     const db = new SQL(process.env.database!)
     try {
@@ -79,6 +85,14 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
 
 }
 
+/**
+ * Take a slot at a given date and time for a patient
+ * @param date 
+ * @param startMinute 
+ * @param duration 
+ * @param patId 
+ * @returns a Termin object representing the booked appointment or null if booking failed
+ */
 export async function takeSlot(date: string, startMinute: number, duration: number, patId: string): Promise<termin> {
     const db = new SQL(process.env.database!)
     const palmid =
@@ -86,7 +100,7 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
     const currentTime = Math.round(new Date().getTime() / 60000).toString();
     const id = Math.random().toString(36).substring(2, 10);
     try {
-        await db`
+        const result = await db`
         INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, palmid, patid,angelegt,erstelltvon, termintyp) 
         VALUES (${id}, ${process.env.bereich || "Arzt"}, 
         ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${palmid}, ${patId} , ${currentTime}, 
@@ -109,13 +123,19 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
     }
 }
 
-export async function deleteAppointment(palmid: string, patid: string): Promise<void> {
+export async function deleteAppointment(appid: string, patid: string): Promise<void> {
     const db = new SQL(process.env.database!)
-    await db`
-        UPDATE agntermine WHERE palmid=${palmid} AND patid=${patid} set deleted="1"
+    try {
+        await db`
+        UPDATE agntermine SET deleted="1" WHERE id=${appid} AND patid=${patid}
     `
-    console.log(`Deleted appointment with palmid ${palmid}`);
-    db.close()
+        console.log(`Deleted appointment with id ${appid} for patient ${patid}`);
+    } catch (e) {
+        console.error("Error deleting appointment:", e)
+        throw e
+    } finally {
+        db.close()
+    }
 }
 
 export async function findAppointments(patid: string): Promise<Array<termin>> {
@@ -129,12 +149,8 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
     `
         const appointments: Array<termin> = []
         for (const appnt of appnts) {
-            const year = parseInt(appnt.tag.substring(0, 4))
-            const month = parseInt(appnt.tag.substring(4, 6)) - 1
-            const day = parseInt(appnt.tag.substring(6, 8))
-            const date = new Date(year, month, day)
             appointments.push({
-                tag: date.toISOString().split('T')[0] || "",
+                tag: appnt.tag,
                 beginn: appnt.beginn,
                 dauer: appnt.dauer,
                 id: appnt.id,
@@ -152,6 +168,12 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
     }
 }
 
+/**
+ * authorize method for the MikroRest server
+ * @param birthdate date as string in format YYYY-MM-DD
+ * @param mail string email address
+ * @returns the patient associated with the credentials or null if not found
+ */
 export async function checkAccess(birthdate: string | null, mail: string | null): Promise<user | null> {
     let db: SQL | null = null
     try {
@@ -161,8 +183,10 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
         if (!mail || mail === "") return Promise.resolve(null)
         const dat = (birthdate || "01-01").split("-")
         if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
+        if (!/^\d+$/.test(dat[0]) || !/^\d+$/.test(dat[1]) || !/^\d+$/.test(dat[2])) return Promise.resolve(null)
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return Promise.resolve(null)
+        if (/[\/\\'";]/.test(mail)) return Promise.resolve(null)
         const elexisdate = dat[0] + dat[1] + dat[2]
-
         const results = await db`
         SELECT * FROM kontakt 
         WHERE geburtsdatum=${elexisdate} AND email=${mail}

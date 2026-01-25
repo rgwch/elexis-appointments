@@ -3,13 +3,33 @@
 To install dependencies:
 
 ```bash
+cd frontend
 bun install
+cd ..
+bun install
+```
+
+To create frontend:
+
+```bash
+cd frontend
+bun install
+bun run build
 ```
 
 To run:
 
 ```bash
-bun run index.ts
+bun index.ts
 ```
 
-This project was created using `bun init` in bun v1.3.0. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+To create standalone executable:
+
+```bash
+cd frontend
+bun install
+bun run build
+cd ..
+bun install
+bun build ./index.ts --compile --outfile termine
+```

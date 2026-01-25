@@ -1,21 +1,14 @@
 import { MikroRest } from '@rgwch/mikrorest'
 import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, takeSlot } from "./index"
+import app from './frontend/src/main';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
 
 const server = new MikroRest({ port, allowedOriginsProd: [`http://localhost:${port}`, ""] })
-/*
-server.addRoute("get", "/api/checkAccess", async (req, res) => {
-    const params = server.getParams(req)
-    const access = await checkAccess(params.get("birthdate"), params.get("mail"))
-    server.sendJson(res, { id: access })
-    return false
-})
-*/
 
 server.addStaticDir("./frontend/dist")
-server.addRoute("get", "/api/getfreeslotsat", async (req, res) => {
+server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const dateStr = params.get("date")
     if (!dateStr) {
@@ -23,11 +16,17 @@ server.addRoute("get", "/api/getfreeslotsat", async (req, res) => {
         return false
     }
     const date = new Date(dateStr)
-    const freeSlots = await getFreeSlotsAt(date)
-    server.sendJson(res, { freeSlots: Array.from(freeSlots) })
-    return false
+    try {
+        const freeSlots = await getFreeSlotsAt(date)
+        server.sendJson(res, { freeSlots: Array.from(freeSlots) })
+        return false
+    } catch (e) {
+        console.error("Error in /api/getfreeslotsat:", e)
+        server.error(res, 500, "Internal server error")
+        return false
+    }
 })
-server.addRoute("post", "/api/takeslot", async (req, res) => {
+server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
     const startMinute = body.startMinute
     const duration = body.duration || parseInt(process.env.defaultAppointmentDuration || "15")
@@ -37,43 +36,67 @@ server.addRoute("post", "/api/takeslot", async (req, res) => {
         server.error(res, 400, "Missing parameters")
         return false
     }
-    const slotID = await takeSlot(date, startMinute, duration, patId)
-    server.sendJson(res, { success: true, slotID: slotID })
-    return false
+    try {
+        const termin = await takeSlot(date, startMinute, duration, patId)
+        server.sendJson(res, termin)
+        return false
+    } catch (e) {
+        console.error("Error in /api/takeslot:", e)
+        server.error(res, 500, "Internal server error")
+        return false
+    }
 })
 
-server.addRoute("get", "/api/findappointments", async (req, res) => {
+server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const patId = params.get("patId")
     if (!patId) {
         server.error(res, 400, "Missing patId parameter")
         return false
     }
-    const appointments = await findAppointments(patId)
-    server.sendJson(res, { appointments: appointments })
-    return false
-})
-
-server.addRoute("post", "/api/deleteappointment", async (req, res) => {
-    const body = await server.readJsonBody(req)
-    const palmid = body.palmid
-    if (!palmid) {
-        server.error(res, 400, "Missing palmid parameter")
+    try {
+        const appointments = await findAppointments(patId)
+        server.sendJson(res, appointments)
+        return false
+    } catch (e) {
+        console.error("Error in /api/findappointments:", e)
+        server.error(res, 500, "Internal server error")
         return false
     }
+})
+
+server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, res) => {
+    const body = await server.readJsonBody(req)
     const patId = body.patId
     if (!patId) {
         server.error(res, 400, "Missing patId parameter")
         return false
     }
-    await deleteAppointment(palmid, patId)
-    server.sendJson(res, { success: true })
-    return false
+    const appid = body.appid
+    if (!appid) {
+        server.error(res, 400, "Missing appid parameter")
+        return false
+    }
+    try {
+        await deleteAppointment(appid, patId)
+        server.sendJson(res, { success: true })
+        return false
+    } catch (e) {
+        console.error("Error in /api/deleteappointment:", e)
+        server.error(res, 500, "Internal server error")
+        return false
+    }
 })
 server.handleLogin("/api/checkaccess", async (birthdate, mail) => {
-    console.log("checkAccess called with", birthdate, mail)
-    const acc=await checkAccess(birthdate, mail)
-    return acc
+
+    // console.log("checkAccess called with", birthdate, mail)
+    try {
+        const acc = await checkAccess(birthdate, mail)
+        return acc
+    } catch (e) {
+        console.error("Error in /api/checkaccess:", e)
+        return false
+    }
 })
 console.log("listening on port", port)
 server.start()

@@ -4,8 +4,10 @@
         bookAppointment,
         findNextPossibleDate,
         findPrevPossibleDate,
+        formatTime,
     } from './io';
     import { _ } from 'svelte-i18n';
+    import { DateTime } from 'luxon';
 
     let selectedDate: string = '';
     let freeSlots: Array<number> = [];
@@ -81,12 +83,6 @@
         }
     }
 
-    function formatTime(minutes: number): string {
-        const hours = Math.floor(minutes / 60);
-        const mins = minutes % 60;
-        return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-    }
-
     async function handleBooking() {
         if (selectedSlot === null) {
             message = $_('please_select_slot');
@@ -98,15 +94,21 @@
 
         try {
             const duration = 30; // Default duration, adjust as needed
-            const success = await bookAppointment(
+            const termin = await bookAppointment(
                 new Date(selectedDate),
                 selectedSlot,
                 duration,
             );
 
-            if (success) {
+            if (termin?.id) {
                 message = $_('appointment_booked', {
-                    values: { slotID: success },
+                    values: {
+                        day: DateTime.fromFormat(
+                            termin.tag,
+                            'yyyyMMdd',
+                        ).toLocaleString(DateTime.DATE_FULL),
+                        time: formatTime(parseInt(termin.beginn)),
+                    },
                 });
                 freeSlots = [];
                 selectedSlot = null;
@@ -195,7 +197,8 @@
         <p
             class="message"
             class:error={message.includes('Error') ||
-                message.includes('Failed')}
+                message.includes('Failed') ||
+                message.includes('Fehler')}
             class:success={message.includes('successfully')}>
             {message}
         </p>
