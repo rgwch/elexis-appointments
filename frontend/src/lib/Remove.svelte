@@ -35,6 +35,14 @@
         selectedIds = newSet; // Create new Set to trigger reactivity
     }
 
+    function isFutureAppointment(appointment: termin): boolean {
+        const appointmentDateTime = DateTime.fromFormat(
+            appointment.tag,
+            'yyyyMMdd',
+        ).plus({ minutes: parseInt(appointment.beginn) });
+        return appointmentDateTime > DateTime.now();
+    }
+
     async function deleteSelected() {
         loading = true;
         try {
@@ -60,19 +68,22 @@
         <p>{$_('loading')}</p>
     {:then}
         {#if appointments.length === 0}
-            <p>{$_('noappointments')}</p>
+            <p class="info-text">{$_('noappointments')}</p>
         {:else}
             <p>{$_('select_appointments_to_remove')}</p>
             <ul class="slots-list">
                 {#each appointments as appointment}
                     <li>
                         <label>
-                            <input
-                                style="margin-right: 0.5rem;"
-                                type="checkbox"
-                                checked={selectedIds.has(appointment.id)}
-                                onclick={() => toggleSelection(appointment.id)}
-                                disabled={loading} />
+                            {#if isFutureAppointment(appointment)}
+                                <input
+                                    style="margin-right: 0.5rem;"
+                                    type="checkbox"
+                                    checked={selectedIds.has(appointment.id)}
+                                    onclick={() =>
+                                        toggleSelection(appointment.id)}
+                                    disabled={loading} />
+                            {/if}
                             {DateTime.fromFormat(
                                 appointment.tag,
                                 'yyyyMMdd',
@@ -94,10 +105,9 @@
             <p style="color: red;">Error: {error}</p>
         {/if}
     {/await}
-   
 </div>
- <div>
-        <button class="cancel-btn" onclick={back}>
-            {$_('back_to_menu')}
-        </button>
-    </div>
+<div>
+    <button class="cancel-btn" onclick={back}>
+        {$_('back_to_menu')}
+    </button>
+</div>

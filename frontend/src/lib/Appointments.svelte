@@ -5,7 +5,9 @@
         findNextPossibleDate,
         findPrevPossibleDate,
         formatTime,
+        sendConfirmationMail,
     } from './io';
+    import type { termin } from '../../../types.d';
     import { _ } from 'svelte-i18n';
     import { DateTime } from 'luxon';
 
@@ -18,6 +20,7 @@
     let message: string = $state('');
     let navigating: boolean = $state(false);
     let booked: boolean = $state(false);
+    let createdAppointment: termin | null = $state(null);
 
     // Set minimum date to today
     const today = new Date();
@@ -96,20 +99,20 @@
 
         try {
             const duration = 30; // Default duration, adjust as needed
-            const termin = await bookAppointment(
+            createdAppointment = await bookAppointment(
                 new Date(selectedDate),
                 selectedSlot,
                 duration,
             );
 
-            if (termin?.id) {
+            if (createdAppointment?.id) {
                 message = $_('appointment_booked', {
                     values: {
                         day: DateTime.fromFormat(
-                            termin.tag,
+                            createdAppointment.tag,
                             'yyyyMMdd',
                         ).toLocaleString(DateTime.DATE_FULL),
-                        time: formatTime(parseInt(termin.beginn)),
+                        time: formatTime(parseInt(createdAppointment.beginn)),
                     },
                 });
                 freeSlots = [];
@@ -125,6 +128,15 @@
         } finally {
             loading = false;
         }
+    }
+
+    async function sendMail() {
+        if (!createdAppointment) {
+            message = $_('error_sending_email');
+            return;
+        }
+        await sendConfirmationMail(createdAppointment.id);
+        message = $_('email_sent_confirmation');
     }
     function back() {
         selectedDate = '';
@@ -221,6 +233,7 @@
         </p>
         <p class="info-text">
             {$_('ask_for_mail')}
+            <button onclick={sendMail}>{$_('send_mail')}</button>
         </p>
     {/if}
 

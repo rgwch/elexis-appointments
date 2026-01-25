@@ -1,4 +1,4 @@
-import ical, { ICalCalendarMethod } from 'ical-generator';
+import ical, { ICalCalendarMethod, ICalEvent } from 'ical-generator';
 import nodemailer from 'nodemailer';
 
 
@@ -23,8 +23,8 @@ export class Mailer {
             port: this.config.port,
             secure: true,
             auth: {
-                user: this.config.user || process.env.SMTPUSER,
-                pass: this.config.pwd || process.env.SMTPPASSWORD,
+                user: this.config.user || process.env.SMTP_USER,
+                pass: this.config.pwd || process.env.SMTP_PASSWORD,
             },
         }
         this.transporter = nodemailer.createTransport(this.smtp)
@@ -33,16 +33,27 @@ export class Mailer {
         address: string,
         subject: string,
         contents: string,
-        date: Date,
         attachment?: Attachment,
-
+        ical?: string
     ): Promise<any> {
-        const message = {
+        const message: {
+            from: string;
+            to: string;
+            subject: string;
+            text: string;
+            icalEvent?: {
+                filename: string;
+                method: string;
+                content: string;
+            };
+            attachments?: Attachment[];
+        } = {
             from: this.sender,
             to: address,
             subject: subject,
             text: contents,
         }
+        /*
         if (ical) {
             message['icalEvent'] = {
                 filename: 'arzttermin.ics',
@@ -53,6 +64,7 @@ export class Mailer {
         if (attachment) {
             message['attachments'] = [attachment]
         }
+            */
         try {
             const result = await this.transporter.sendMail(message)
             return result

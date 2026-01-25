@@ -141,3 +141,7 @@ export async function bookAppointment(date: Date, startMinute: number, duration:
 export async function removeAppointment(appid: string): Promise<void> {
     await doFetch(baseURL + `/api/deleteappointment`, { appid, patId: user.id });
 }
+
+export async function sendConfirmationMail(id: string): Promise<void> {
+    await doFetch(baseURL + `/api/sendmail?id=${id}`);
+}

@@ -1,5 +1,5 @@
 import { MikroRest } from '@rgwch/mikrorest'
-import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, takeSlot } from "./index"
+import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, sendMail, takeSlot } from "./index"
 import app from './frontend/src/main';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
@@ -87,6 +87,17 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
         return false
     }
 })
+
+server.addRoute("get", "/api/sendmail", async (req, res) => {
+    const params = server.getParams(req)
+    const id = params.get("id")
+    if (!id) {
+        server.error(res, 400, "Missing id parameter")
+        return false
+    } await sendMail(id)
+    return false
+})
+
 server.handleLogin("/api/checkaccess", async (birthdate, mail) => {
 
     // console.log("checkAccess called with", birthdate, mail)

@@ -1,7 +1,8 @@
 import "dotenv/config"
 import type { termin, user } from "./types"
 import { sql, SQL } from "bun"
-
+import { Mailer } from "./mailer"
+import ical from "ical-generator"
 
 function elexisdateFromDate(date: Date): string {
     const day = date.getDate()
@@ -99,10 +100,10 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
     const id = Math.random().toString(36).substring(2, 10);
     try {
         const result = await db`
-        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, patid,angelegt,erstelltvon, termintyp) 
+        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, patid,angelegt,erstelltvon, termintyp, terminstatus) 
         VALUES (${id}, ${process.env.bereich || "Arzt"}, 
         ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${patId} , ${currentTime}, 
-        "internet", ${process.env.TerminTyp || "Normal"})
+        "internet", ${process.env.TerminTyp || "Normal"}, ${process.env.CreatedState || "geplant"})
     `
         return {
             id: id,
@@ -125,7 +126,7 @@ export async function deleteAppointment(appid: string, patid: string): Promise<v
     const db = new SQL(process.env.database!)
     try {
         await db`
-        UPDATE agntermine SET deleted="1" WHERE id=${appid} AND patid=${patid}
+        UPDATE agntermine SET terminstatus=${process.env.CancelledState || "abgesagt"} WHERE id=${appid} AND patid=${patid}
     `
         console.log(`Deleted appointment with id ${appid} for patient ${patid}`);
     } catch (e) {
@@ -142,8 +143,8 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
         db = new SQL(process.env.database!)
         const appnts = await db`
         SELECT * FROM agntermine 
-        WHERE patid=${patid} AND deleted="0" 
-        ORDER BY tag, beginn
+        WHERE patid=${patid} AND deleted="0" AND terminstatus!=${process.env.CancelledState || "abgesagt"} 
+        ORDER BY tag DESC, CAST(beginn AS UNSIGNED) DESC
     `
         const appointments: Array<termin> = []
         for (const appnt of appnts) {
@@ -163,6 +164,69 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
         throw e
     } finally {
         db?.close()
+    }
+}
+
+export async function sendMail(id: string) {
+    const db = new SQL(process.env.database!)
+    try {
+        const results = await db`SELECT * from agntermine WHERE id=${id}`
+        if (results.length === 0) {
+            throw new Error("Appointment not found")
+        }
+        const appointment = results[0]
+        const patientResults = await db`SELECT * from kontakt WHERE id=${appointment.patid}`
+        if (patientResults.length === 0) {
+            throw new Error("Patient not found")
+        }
+        const patient = patientResults[0]
+        if (!patient.email || patient.email === "") {
+            throw new Error("Patient has no email")
+        }
+        console.log(`Sending email to ${patient.email} for appointment on ${appointment.tag} at ${appointment.beginn}`)
+        const mailer = new Mailer({
+            host: process.env.SMTP_SERVER,
+            port: parseInt(process.env.SMTP_PORT || "465"),
+            user: process.env.SMTP_USER,
+            pwd: process.env.SMTP_PASSWORD
+        }, process.env.MAIL_FROM || "")
+        const appointmentDate = new Date(
+            parseInt(appointment.tag.substring(0, 4)),
+            parseInt(appointment.tag.substring(4, 6)) - 1,
+            parseInt(appointment.tag.substring(6, 8)),
+            Math.floor(parseInt(appointment.beginn) / 60),
+            parseInt(appointment.beginn) % 60
+        )
+        const cal = ical({ "prodId": "elexis-appointments", "name": "Arzttermin" })
+        cal.createEvent({
+            start: appointmentDate,
+            end: new Date(appointmentDate.getTime() + 15 * 60000),
+            summary: "Arzttermin",
+            description: `Ihr Termin in der Praxis am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.`,
+            organizer: {
+                name: "Praxis",
+                email: process.env.MAIL_FROM || ""
+            }
+        })
+        const icalString = cal.toString()
+        const subject = `Terminbestätigung für ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr`
+        const contents = `Sehr geehrte/r ${patient.bezeichnung2} ${patient.bezeichnung1},\n\n` +
+            `hiermit bestätigen wir Ihren Termin am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.\n\n` +
+            `Bitte denken Sie daran, uns rechtzeitig zu informieren, falls Sie den Termin nicht wahrnehmen können.\n\n` +
+            `Freundliche Grüsse\nIhre Praxis`
+        await mailer.send(
+            patient.email,
+            subject,
+            contents,
+            undefined,
+            icalString
+        )
+        console.log(`Email sent to ${patient.email} for appointment ${id}`);
+    } catch (e) {
+        console.error("Error sending mail:", e)
+        throw e
+    } finally {
+        db.close()
     }
 }
 
@@ -187,8 +251,8 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
         const elexisdate = dat[0] + dat[1] + dat[2]
         const results = await db`
         SELECT * FROM kontakt 
-        WHERE geburtsdatum=${elexisdate} AND email=${mail}
-    `;
+        WHERE geburtsdatum = ${elexisdate} AND email = ${mail}
+        `;
         if (results.length > 0) {
             return {
                 id: results[0].id,
@@ -206,5 +270,6 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
     }
 
 }
+
 
 import './server'
