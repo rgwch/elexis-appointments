@@ -38,7 +38,7 @@ export async function checkAccess(birthdate: string, mail: string): Promise<bool
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ password: mail, username: birthdate })
+            body: JSON.stringify({ password: birthdate, username: mail })
         }
         const response = await fetch(baseURL + `/api/checkaccess`, options)
         if (response.ok) {
@@ -158,5 +158,5 @@ export async function removeAppointment(appid: string): Promise<void> {
 }
 
 export async function sendConfirmationMail(id: string): Promise<void> {
-    await doFetch(baseURL + `/api/sendmail?id=${id}`);
+    await doFetch(baseURL + `/api/sendconfirmation?id=${id}`);
 }

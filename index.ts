@@ -298,7 +298,8 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
                 id: results[0].id,
                 lastname: results[0].bezeichnung1,
                 firstname: results[0].bezeichnung2,
-                mail
+                mail,
+                verified: false
             };
         }
         return null;

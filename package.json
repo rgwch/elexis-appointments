@@ -2,6 +2,7 @@
   "name": "elexis-appointments",
   "module": "index.ts",
   "type": "module",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "@types/bun": "latest"
@@ -10,7 +11,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@rgwch/mikrorest": "^0.9.0",
+    "@rgwch/mikrorest": "^0.9.1",
     "@types/nodemailer": "^7.0.5",
     "dotenv": "^17.2.3",
     "ical-generator": "^10.0.0",

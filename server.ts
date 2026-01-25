@@ -71,6 +71,8 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
 
 server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
+    const user = (req as any)["user"];
+    console.log(user)
     const patId = params.get("patId")
     if (!patId) {
         server.error(res, 400, "Missing patId parameter")
@@ -110,7 +112,7 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
     }
 })
 
-server.addRoute("get", "/api/sendmail", async (req, res) => {
+server.addRoute("get", "/api/sendconfirmation", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const id = params.get("id")
     if (!id) {
@@ -120,7 +122,7 @@ server.addRoute("get", "/api/sendmail", async (req, res) => {
     return false
 })
 
-server.handleLogin("/api/checkaccess", async (birthdate, mail) => {
+server.handleLogin("/api/checkaccess", async (mail, birthdate) => {
 
     // console.log("checkAccess called with", birthdate, mail)
     try {
