@@ -168,17 +168,16 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
     }
 }
 
-export async function sendToken(mail: string): Promise<void> {
+export async function sendToken(mail: string, token: string, validUntil: Date): Promise<void> {
     const mailer = new Mailer({
         host: process.env.SMTP_SERVER,
         port: parseInt(process.env.SMTP_PORT || "465"),
         user: process.env.SMTP_USER,
         pwd: process.env.SMTP_PASSWORD
     }, process.env.MAIL_FROM || "")
-    const subject = `Ihr Zugangstoken für die Terminverwaltung`
-    const token = Math.random().toString(36).substring(2, 10);
-    const contents = `Bitte verwenden Sie diese Zeichenfolge, um den Zugang zu Ihrer Terminloste freizuschalten:\n\n` +
-        `${token}\n\n` +
+    const subject = `Ihr Zugang für die Terminverwaltung Praxis Breite`
+    const contents = `Bitte folgen Sie diesem Link, um den Zugang zu Ihrer Terminliste freizuschalten:\n\n` +
+        `https://${process.env.URL}?token=${token}\n\n` +
         `Falls Sie diese E-Mail irrtümlich erhalten haben, können Sie sie einfach ignorieren.\n\n`
     try {
         const result = await mailer.send(

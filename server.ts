@@ -1,6 +1,8 @@
 import { MikroRest } from '@rgwch/mikrorest'
-import { checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt, sendMail, takeSlot, verifyToken } from "./index"
-import app from './frontend/src/main';
+import {
+    checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,
+    sendMail, takeSlot, verifyToken, sendToken
+} from "./index"
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
@@ -8,6 +10,10 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development"
 const server = new MikroRest({ port, allowedOriginsProd: [`http://localhost:${port}`, ""] })
 
 server.addStaticDir("./frontend/dist")
+
+/**
+ * Get free slots at a given date
+ */
 server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const dateStr = params.get("date")
@@ -27,7 +33,17 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
     }
 })
 
-server.addRoute("get", "/api/verifytoken", async (req, res) => {
+server.addRoute("get", "/api/sendtoken", async (req, res) => {
+    const user = (req as any).user;
+    if (!user || !user.mail) {
+        server.error(res, 400, "Missing mail parameter")
+        return false
+    }
+    const { token, validUntil } = MikroRest.createJWT(user)
+    sendToken(user.mail, token, validUntil);
+})
+
+server.addRoute("get", "/api/verifytoken", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const token = params.get("token")
     if (!token) {
@@ -37,7 +53,7 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
     try {
         const user = await verifyToken(token) // implement in index.ts
         if (user) {
-            const jwtToken = MikroRest.createJWT("", "", { verified: true })
+            const jwtToken = MikroRest.createJWT("", { verified: true })
             server.sendJson(res, { token: jwtToken, user })
         } else {
             server.error(res, 401, "Invalid token")
@@ -69,10 +85,16 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     }
 })
 
+/**
+ * Find existing appointments for the currently logged in user. If they are noit verified, return 401 Unauthorized.
+ */
 server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
-    const user = (req as any)["user"];
-    console.log(user)
+    const user = (req as any).user;
+    if (!user.verified) {
+        server.error(res, 401, "Unauthorized")
+        return false
+    }
     const patId = params.get("patId")
     if (!patId) {
         server.error(res, 400, "Missing patId parameter")
@@ -89,8 +111,16 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
     }
 })
 
+/**
+ * Delete an appointment by its ID for the currently logged in user. If they are not verified, return 401 Unauthorized.
+ */
 server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
+    const user = (req as any).user;
+    if (!user.verified) {
+        server.error(res, 401, "Unauthorized")
+        return false
+    }
     const patId = body.patId
     if (!patId) {
         server.error(res, 400, "Missing patId parameter")
@@ -112,6 +142,9 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
     }
 })
 
+/**
+ * Send a confirmation mail for an appointment
+ */
 server.addRoute("get", "/api/sendconfirmation", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const id = params.get("id")
@@ -122,9 +155,10 @@ server.addRoute("get", "/api/sendconfirmation", server.authorize, async (req, re
     return false
 })
 
+/**
+ * Login handler for checking access with birthdate and mail, used by MikroRest's handleLogin
+ */
 server.handleLogin("/api/checkaccess", async (mail, birthdate) => {
-
-    // console.log("checkAccess called with", birthdate, mail)
     try {
         const acc = await checkAccess(birthdate, mail)
         return acc

@@ -16,6 +16,11 @@ export function formatTime(minutes: number): string {
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 }
 
+/**
+ * Authenticate user by verifying email token
+ * @param token 
+ * @returns true if the user could be verified, false otherwise
+ */
 export async function verifyEmailToken(token: string): Promise<boolean> {
     try {
         const response = await fetch(baseURL + `/api/verifytoken?token=${token}`)
@@ -31,6 +36,12 @@ export async function verifyEmailToken(token: string): Promise<boolean> {
     return false
 }
 
+/**
+ * initial login with birthdate and mail
+ * @param birthdate 
+ * @param mail 
+ * @returns 
+ */
 export async function checkAccess(birthdate: string, mail: string): Promise<boolean> {
     try {
         const options = {
@@ -46,6 +57,8 @@ export async function checkAccess(birthdate: string, mail: string): Promise<bool
             jwtToken = data.token
             user = data.user
             return true
+        } else {
+            console.error("Access check failed with status:", response.status)
         }
     } catch (e) {
         console.error("Error during checkAccess:", e)
@@ -61,6 +74,12 @@ function createHeader(): Headers {
     }
     return headers
 }
+
+/**
+ * Find free slots at a given date
+ * @param date 
+ * @returns 
+ */
 export async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
     const headers = createHeader()
 
