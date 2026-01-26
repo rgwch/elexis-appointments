@@ -8,12 +8,12 @@
         sendConfirmationMail,
     } from './io';
     import type { termin } from '../../../types.d';
-    import { _ } from 'svelte-i18n';
+    import { _, locale } from 'svelte-i18n';
     import { DateTime } from 'luxon';
 
     let { mode = $bindable() } = $props();
 
-    let selectedDate: string = $state('');
+    let selectedDate: string = $state(DateTime.now().toISODate());
     let freeSlots: Array<number> = $state([]);
     let selectedSlot: number | null = $state(null);
     let loading: boolean = $state(false);
@@ -21,6 +21,14 @@
     let navigating: boolean = $state(false);
     let booked: boolean = $state(false);
     let createdAppointment: termin | null = $state(null);
+
+    // Format the date with weekday
+    let formattedDate = $derived(() => {
+        if (!selectedDate) return '';
+        const dt = DateTime.fromISO(selectedDate);
+        const currentLocale = $locale || 'de';
+        return dt.setLocale(currentLocale).toFormat('ccc, dd.MM.yyyy');
+    });
 
     // Set minimum date to today
     const today = new Date();
@@ -148,6 +156,7 @@
         booked = false;
         mode = 'select';
     }
+    handleDateChange();
 </script>
 
 <div class="card">
@@ -155,23 +164,6 @@
         <h2>{$_('select_appointment')}</h2>
 
         <div class="date-selector">
-            <label for="date">
-                <svg
-                    class="input-icon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    style="width: 18px; height: 18px; margin-right: 0.5rem; color: #667eea;">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"
-                    ></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                {$_('select_date')}
-            </label>
             <div class="date-input-container">
                 <button
                     type="button"
@@ -188,13 +180,18 @@
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                 </button>
-                <input
-                    type="date"
-                    id="date"
-                    bind:value={selectedDate}
-                    onchange={handleDateChange}
-                    min={minDate}
-                    disabled={loading || navigating} />
+                <div class="date-input-wrapper">
+                    <input
+                        type="date"
+                        id="date"
+                        bind:value={selectedDate}
+                        onchange={handleDateChange}
+                        min={minDate}
+                        disabled={loading || navigating} />
+                    {#if formattedDate()}
+                        <div class="formatted-date">{formattedDate()}</div>
+                    {/if}
+                </div>
                 <button
                     type="button"
                     class="nav-button nav-next"
@@ -359,6 +356,41 @@
     .date-selector input[type='date']:disabled {
         background-color: #f7fafc;
         cursor: not-allowed;
+    }
+
+    .date-input-wrapper {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        min-width: 210px;
+    }
+
+    .date-input-wrapper input[type='date'] {
+        width: 100%;
+    }
+
+    .date-input-wrapper input[type='date']::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        position: absolute;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .formatted-date {
+        position: absolute;
+        left: 1rem;
+        pointer-events: none;
+        color: #2d3748;
+        font-size: 1rem;
+        background-color: white;
+        padding-right: 2rem;
+    }
+
+    .date-input-wrapper input[type='date']:disabled + .formatted-date {
+        background-color: #f7fafc;
     }
 
     .loading {

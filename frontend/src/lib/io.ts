@@ -23,9 +23,8 @@ export function formatTime(minutes: number): string {
  */
 export async function verifyEmailToken(token: string): Promise<boolean> {
     try {
-        const response = await fetch(baseURL + `/api/verifytoken?token=${token}`)
-        if (response.ok) {
-            const data = await response.json()
+        const data = await doFetch(`/api/verifytoken?token=${token}`)
+        if (data) {
             jwtToken = data.token
             user = data.user
             return true
@@ -89,7 +88,7 @@ export async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
 }
 
 export async function findAppointments(): Promise<Array<termin>> {
-    const data = await doFetch(baseURL + `/api/findappointments?patId=${user.id}`)
+    const data = await doFetch(`/api/findappointments?patId=${user.id}`)
     return data
 }
 
@@ -133,9 +132,9 @@ async function doFetch(url: string, body?: any): Promise<any> {
         options.body = JSON.stringify(body)
     }
     try {
-        const response = await fetch(url, options)
+        const response = await fetch(baseURL + url, options)
         if (response.ok) {
-            if (response.bodyUsed) {
+            if (response.body) {
                 return await response.json()
             } else {
                 return null
@@ -149,8 +148,12 @@ async function doFetch(url: string, body?: any): Promise<any> {
                 alert(trl("internal_server_error"))
             } else if (response.status === 420) {
                 if (window.confirm(trl("2nd_factor_required"))) {
-                    await doFetch("/api/sendtoken");
-                    alert(trl("check_email_for_token"))
+                    const resp = await doFetch("/api/sendtoken");
+                    if (resp.ok) {
+                        alert(trl("check_email_for_token"))
+                    } else {
+                        alert(trl("error_sending_2nd_factor"))
+                    }
                     throw new Error("2nd factor required")
                 }
             }
@@ -170,7 +173,7 @@ export async function bookAppointment(date: Date, startMinute: number, duration:
         patId: user.id
     }
     try {
-        const data = await doFetch(baseURL + `/api/takeslot`, body)
+        const data = await doFetch(`/api/takeslot`, body)
         if (!data?.id) {
             throw new Error("Booking failed")
         }
@@ -182,9 +185,9 @@ export async function bookAppointment(date: Date, startMinute: number, duration:
 }
 
 export async function removeAppointment(appid: string): Promise<void> {
-    await doFetch(baseURL + `/api/deleteappointment`, { appid, patId: user.id });
+    await doFetch(`/api/deleteappointment`, { appid, patId: user.id });
 }
 
 export async function sendConfirmationMail(id: string): Promise<void> {
-    await doFetch(baseURL + `/api/sendconfirmation?id=${id}`);
+    await doFetch(`/api/sendconfirmation?id=${id}`);
 }

@@ -18,10 +18,10 @@
     if (token) {
       const success = await verifyEmailToken(token);
       if (success) {
-        // Clear token from URL
-        window.history.replaceState({}, '', window.location.pathname);
         // Set your app state to logged in
         mode = 'display';
+        // Clear token from URL
+        window.history.replaceState({}, '', window.location.pathname);
       } else {
         // Handle invalid token
       }
@@ -31,16 +31,6 @@
 
 <div class="app-container">
   <div class="header">
-    <svg
-      class="icon"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2">
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
     <h1>{$_('app_title')}</h1>
   </div>
 
@@ -57,7 +47,7 @@
 
 <style>
   .app-container {
-    min-height: 100vh;
+    /*min-height: 100vh; */
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     max-width: 800px;
@@ -84,13 +74,6 @@
     margin-bottom: 2rem;
   }
 
-  .icon {
-    width: 64px;
-    height: 64px;
-    color: #667eea;
-    margin-bottom: 1rem;
-  }
-
   .cancel-btn {
     background: #ea66ac;
     color: white;
@@ -112,10 +95,6 @@
   @media (max-width: 640px) {
     .app-container {
       padding: 1rem;
-    }
-
-    .login-card {
-      padding: 2rem 1.5rem;
     }
   }
 </style>

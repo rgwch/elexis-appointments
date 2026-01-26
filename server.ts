@@ -1,8 +1,9 @@
 import { MikroRest } from '@rgwch/mikrorest'
 import {
     checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,
-    sendMail, takeSlot, verifyToken, sendToken
+    sendMail, takeSlot, sendToken
 } from "./index"
+import { decode } from 'node:punycode';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
@@ -34,17 +35,17 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
 })
 
 server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
-    const user = (req as any).user;
+    const user = (req as any).user?.user;
     if (!user || !user.mail) {
         server.error(res, 400, "Missing mail parameter")
         return false
     }
-    const { token, validUntil } = MikroRest.createJWT(user)
+    const { token, validUntil } = MikroRest.createJWT({ ...user, verified: true })
     await sendToken(user.mail, token, validUntil);
     return false
 })
 
-server.addRoute("get", "/api/verifytoken", server.authorize, async (req, res) => {
+server.addRoute("get", "/api/verifytoken", async (req, res) => {
     const params = server.getParams(req)
     const token = params.get("token")
     if (!token) {
@@ -52,10 +53,9 @@ server.addRoute("get", "/api/verifytoken", server.authorize, async (req, res) =>
         return false
     }
     try {
-        const user = await verifyToken(token) // implement in index.ts
+        const user = MikroRest.decodeJWT(token)?.user;
         if (user) {
-            const jwtToken = MikroRest.createJWT("", { verified: true })
-            server.sendJson(res, { token: jwtToken, user })
+            server.sendJson(res, { token, user })
         } else {
             server.error(res, 401, "Invalid token")
         }
@@ -91,7 +91,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
  */
 server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
-    const user = (req as any).user;
+    const user = (req as any).user?.user;
     if (!user.verified) {
         server.error(res, 420, "2nd factor authentication required")
         return false

@@ -5,7 +5,6 @@ import { Mailer } from "./mailer"
 import ical from "ical-generator"
 import { getTokenEmail, getConfirmationEmail, getICalConfig, renderICalDescription } from "./email-templates"
 
-const tokens: Map<string, { token: string, verified: boolean }> = new Map();
 function elexisdateFromDate(date: Date): string {
     const day = date.getDate()
     const month = date.getMonth() + 1
@@ -168,19 +167,18 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
         user: process.env.SMTP_USER,
         pwd: process.env.SMTP_PASSWORD
     }, process.env.MAIL_FROM || "")
-    
+
     const { subject, body } = getTokenEmail({
-        verificationLink: `https://${process.env.URL}?token=${token}`,
+        verificationLink: `${process.env.URL}?token=${token}`,
         validUntil: validUntil.toLocaleString()
     })
-    
+
     try {
         const result = await mailer.send(
             mail,
             subject,
             body
         )
-        tokens.set(mail, { token, verified: false });
         console.log(`Sent token email to ${mail}`);
     } catch (e) {
         console.error("Error sending token email:", e)
@@ -188,17 +186,6 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
     }
 }
 
-export async function verifyToken(token: string): Promise<boolean> {
-    if (tokens.has(token)) {
-        const entry = tokens.get(token);
-        if (entry && entry.token === token) {
-            tokens.set(token, { token: entry.token, verified: true });
-            return true;
-
-        }
-    }
-    return false
-}
 
 export async function sendMail(id: string) {
     const db = new SQL(process.env.database!)
@@ -230,10 +217,10 @@ export async function sendMail(id: string) {
             Math.floor(parseInt(appointment.beginn) / 60),
             parseInt(appointment.beginn) % 60
         )
-        
+
         const dateStr = appointmentDate.toLocaleDateString()
         const timeStr = appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        
+
         const icalConfig = getICalConfig()
         const cal = ical({ "prodId": icalConfig.prodId, "name": icalConfig.summary })
         cal.createEvent({
@@ -247,7 +234,7 @@ export async function sendMail(id: string) {
             }
         })
         const icalString = cal.toString()
-        
+
         const { subject, body } = getConfirmationEmail({
             salutation: patient.bezeichnung2,
             lastname: patient.bezeichnung1,
