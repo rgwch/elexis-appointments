@@ -117,7 +117,7 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
  */
 server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
-    const user = (req as any).user;
+    const user = (req as any).user?.user;
     if (!user.verified) {
         server.error(res, 401, "Unauthorized")
         return false

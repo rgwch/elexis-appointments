@@ -16,6 +16,7 @@
     let selectedDate: string = $state(DateTime.now().toISODate());
     let freeSlots: Array<number> = $state([]);
     let selectedSlot: number | null = $state(null);
+    let appointmentReason: string = $state('');
     let loading: boolean = $state(false);
     let message: string = $state('');
     let navigating: boolean = $state(false);
@@ -126,6 +127,7 @@
                 freeSlots = [];
                 selectedSlot = null;
                 selectedDate = '';
+                appointmentReason = '';
                 booked = true;
             } else {
                 message = $_('error_booking');
@@ -150,6 +152,7 @@
         selectedDate = '';
         freeSlots = [];
         selectedSlot = null;
+        appointmentReason = '';
         loading = false;
         message = '';
         navigating = false;
@@ -251,6 +254,16 @@
                     </li>
                 {/each}
             </ul>
+
+            <div class="reason-section">
+                <label for="reason">{$_('appointment_reason')}</label>
+                <textarea
+                    id="reason"
+                    bind:value={appointmentReason}
+                    placeholder={$_('appointment_reason_placeholder')}
+                    rows="3"
+                    maxlength="200"></textarea>
+            </div>
 
             <button
                 class="book-button"
@@ -448,6 +461,40 @@
         font-weight: 600;
         color: #2d3748;
         margin-bottom: 1rem;
+    }
+
+    .reason-section {
+        margin-top: 1.5rem;
+    }
+
+    .reason-section label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .reason-section textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        resize: vertical;
+        box-sizing: border-box;
+    }
+
+    .reason-section textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .reason-section textarea::placeholder {
+        color: #a0aec0;
     }
 
     .book-button {

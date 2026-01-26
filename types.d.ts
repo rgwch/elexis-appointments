@@ -5,6 +5,7 @@ export type termin = {
     beginn: string
     dauer: string
     termintyp: string
+    grund: string
     deleted: string
 }
 export type user = {

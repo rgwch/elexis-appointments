@@ -4,6 +4,8 @@
   "app_title": "Praxis Breite Termine",
   "appointment_booked": "Termin am {day} um {time} Uhr wurde gebucht",
   "appointment_explanation": "Bitte um rechtzeitige Absage, falls Sie den Termin nicht wahrnehmen können.",
+  "appointment_reason": "Grund für den Termin (optional):",
+  "appointment_reason_placeholder": "z.B. Kontrolltermin, Impfung, Beratung...",
   "ask_for_mail": "Falls Sie eine Bestätigung des Termins per E-Mail wünschen, klicken Sie hier",
   "available_slots": "Verfügbare Zeitfenster:",
   "back_to_menu": "Zurück",
