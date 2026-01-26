@@ -33,7 +33,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
     }
 })
 
-server.addRoute("get", "/api/sendtoken", async (req, res) => {
+server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
     const user = (req as any).user;
     if (!user || !user.mail) {
         server.error(res, 400, "Missing mail parameter")
@@ -87,13 +87,13 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
 })
 
 /**
- * Find existing appointments for the currently logged in user. If they are noit verified, return 401 Unauthorized.
+ * Find existing appointments for the currently logged in user. If they are not verified, return 401 Unauthorized.
  */
 server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const user = (req as any).user;
-    if (false /*!user.verified*/) {
-        server.error(res, 401, "Unauthorized")
+    if (!user.verified) {
+        server.error(res, 420, "2nd factor authentication required")
         return false
     }
     const patId = params.get("patId")

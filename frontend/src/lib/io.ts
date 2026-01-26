@@ -135,7 +135,11 @@ async function doFetch(url: string, body?: any): Promise<any> {
     try {
         const response = await fetch(url, options)
         if (response.ok) {
-            return await response.json()
+            if (response.bodyUsed) {
+                return await response.json()
+            } else {
+                return null
+            }
         } else {
             if (response.status === 401) {
                 jwtToken = null
@@ -143,6 +147,12 @@ async function doFetch(url: string, body?: any): Promise<any> {
                 alert(trl("expired"))
             } else if (response.status === 500) {
                 alert(trl("internal_server_error"))
+            } else if (response.status === 420) {
+                if (window.confirm(trl("2nd_factor_required"))) {
+                    await doFetch("/api/sendtoken");
+                    alert(trl("check_email_for_token"))
+                    throw new Error("2nd factor required")
+                }
             }
             throw new Error(`Request failed with status ${response.status}`)
         }
@@ -150,7 +160,6 @@ async function doFetch(url: string, body?: any): Promise<any> {
         console.error("Error during doFetch:", e)
         throw e
     }
-
 }
 export async function bookAppointment(date: Date, startMinute: number, duration: number): Promise<termin> {
     const headers = createHeader()

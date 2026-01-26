@@ -2,13 +2,13 @@ import { describe, test, expect, beforeAll } from "bun:test"
 
 // Mock environment variables before importing server
 process.env.database = process.env.database || "mysql://test:test@localhost:3306/test_elexis"
-process.env.PORT = "3999" // Use different port for testing
+// process.env.PORT = "3999" // Use different port for testing
 process.env.MICROREST_JWT_SECRET = "test-secret-key"
 process.env.bereich = "Test"
 process.env.NODE_ENV = "test"
 
 describe("Server API Endpoints", () => {
-    const baseURL = `http://localhost:${process.env.PORT}`
+    const baseURL = `http://localhost:${process.env.PORT || 3000}`
     let authToken = ""
     let testPatientId = ""
 
