@@ -1,0 +1,16 @@
+{
+  "token": {
+    "subject": "Ihr Zugang für die Terminverwaltung Praxis Breite",
+    "body": "Bitte folgen Sie diesem Link, um den Zugang zu Ihrer Terminliste freizuschalten:\n\n{{verificationLink}}\n\nDieser Link ist gültig bis {{validUntil}}.\n\nFalls Sie diese E-Mail irrtümlich erhalten haben, können Sie sie einfach ignorieren.\n\n"
+  },
+  "confirmation": {
+    "subject": "Terminbestätigung für {{date}} um {{time}} Uhr",
+    "body": "Sehr geehrte/r {{salutation}} {{lastname}} {{firstname}},\n\nhiermit bestätigen wir Ihren Termin am {{date}} um {{time}} Uhr.\n\nBitte denken Sie daran, uns rechtzeitig zu informieren, falls Sie den Termin nicht wahrnehmen können.\n\nFreundliche Grüsse\nIhre Praxis"
+  },
+  "ical": {
+    "summary": "Arzttermin",
+    "description": "Ihr Termin in der Praxis am {{date}} um {{time}} Uhr.",
+    "organizerName": "Praxis",
+    "prodId": "elexis-appointments"
+  }
+}

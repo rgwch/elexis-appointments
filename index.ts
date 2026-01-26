@@ -3,6 +3,7 @@ import type { termin, user } from "./types"
 import { sql, SQL } from "bun"
 import { Mailer } from "./mailer"
 import ical from "ical-generator"
+import { getTokenEmail, getConfirmationEmail, getICalConfig, renderICalDescription } from "./email-templates"
 
 const tokens: Map<string, { token: string, verified: boolean }> = new Map();
 function elexisdateFromDate(date: Date): string {
@@ -36,8 +37,8 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
         });
 
         const freeSlots = new Set<number>();
-        const workStart = 8 * 60; // 08:00
-        const workEnd = 18 * 60; // 18:00
+        const workStart = parseInt(process.env.workStart || "8") * 60;
+        const workEnd = parseInt(process.env.workEnd || "18") * 60;
 
         for (let minute = workStart; minute < workEnd; minute++) {
             if (!takenSlots.has(minute)) {
@@ -138,6 +139,11 @@ export async function deleteAppointment(appid: string, patid: string): Promise<v
     }
 }
 
+/**
+ * Find appointments for a given patient
+ * @param patid id of the patient, which appointments to find
+ * @returns 
+ */
 export async function findAppointments(patid: string): Promise<Array<termin>> {
     let db: SQL | null = null
     try {
@@ -145,21 +151,8 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
         const appnts = await db`
         SELECT * FROM agntermine 
         WHERE patid=${patid} AND deleted="0" AND terminstatus!=${process.env.CancelledState || "abgesagt"} 
-        ORDER BY tag DESC, CAST(beginn AS UNSIGNED) DESC
-    `
-        const appointments: Array<termin> = []
-        for (const appnt of appnts) {
-            appointments.push({
-                tag: appnt.tag,
-                beginn: appnt.beginn,
-                dauer: appnt.dauer,
-                id: appnt.id,
-                termintyp: appnt.termintyp,
-                patid: appnt.patid,
-                deleted: appnt.deleted
-            })
-        }
-        return appointments;
+        ORDER BY tag DESC, CAST(beginn AS UNSIGNED) DESC`
+        return appnts;
     } catch (e) {
         console.error("Error finding appointments:", e)
         throw e
@@ -175,15 +168,17 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
         user: process.env.SMTP_USER,
         pwd: process.env.SMTP_PASSWORD
     }, process.env.MAIL_FROM || "")
-    const subject = `Ihr Zugang für die Terminverwaltung Praxis Breite`
-    const contents = `Bitte folgen Sie diesem Link, um den Zugang zu Ihrer Terminliste freizuschalten:\n\n` +
-        `https://${process.env.URL}?token=${token}\n\n` +
-        `Falls Sie diese E-Mail irrtümlich erhalten haben, können Sie sie einfach ignorieren.\n\n`
+    
+    const { subject, body } = getTokenEmail({
+        verificationLink: `https://${process.env.URL}?token=${token}`,
+        validUntil: validUntil.toLocaleString()
+    })
+    
     try {
         const result = await mailer.send(
             mail,
             subject,
-            contents
+            body
         )
         tokens.set(mail, { token, verified: false });
         console.log(`Sent token email to ${mail}`);
@@ -235,27 +230,35 @@ export async function sendMail(id: string) {
             Math.floor(parseInt(appointment.beginn) / 60),
             parseInt(appointment.beginn) % 60
         )
-        const cal = ical({ "prodId": "elexis-appointments", "name": "Arzttermin" })
+        
+        const dateStr = appointmentDate.toLocaleDateString()
+        const timeStr = appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        
+        const icalConfig = getICalConfig()
+        const cal = ical({ "prodId": icalConfig.prodId, "name": icalConfig.summary })
         cal.createEvent({
             start: appointmentDate,
             end: new Date(appointmentDate.getTime() + 15 * 60000),
-            summary: "Arzttermin",
-            description: `Ihr Termin in der Praxis am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.`,
+            summary: icalConfig.summary,
+            description: renderICalDescription({ date: dateStr, time: timeStr }),
             organizer: {
-                name: "Praxis",
+                name: icalConfig.organizerName,
                 email: process.env.MAIL_FROM || ""
             }
         })
         const icalString = cal.toString()
-        const subject = `Terminbestätigung für ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr`
-        const contents = `Sehr geehrte/r ${patient.bezeichnung2} ${patient.bezeichnung1},\n\n` +
-            `hiermit bestätigen wir Ihren Termin am ${appointmentDate.toLocaleDateString()} um ${appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} Uhr.\n\n` +
-            `Bitte denken Sie daran, uns rechtzeitig zu informieren, falls Sie den Termin nicht wahrnehmen können.\n\n` +
-            `Freundliche Grüsse\nIhre Praxis`
+        
+        const { subject, body } = getConfirmationEmail({
+            salutation: patient.bezeichnung2,
+            lastname: patient.bezeichnung1,
+            firstname: patient.bezeichnung2,
+            date: dateStr,
+            time: timeStr
+        })
         const result = await mailer.send(
             patient.email,
             subject,
-            contents,
+            body,
             undefined,
             icalString
         )

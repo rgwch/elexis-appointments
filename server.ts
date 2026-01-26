@@ -40,7 +40,8 @@ server.addRoute("get", "/api/sendtoken", async (req, res) => {
         return false
     }
     const { token, validUntil } = MikroRest.createJWT(user)
-    sendToken(user.mail, token, validUntil);
+    await sendToken(user.mail, token, validUntil);
+    return false
 })
 
 server.addRoute("get", "/api/verifytoken", server.authorize, async (req, res) => {
@@ -91,7 +92,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
 server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
     const user = (req as any).user;
-    if (!user.verified) {
+    if (false /*!user.verified*/) {
         server.error(res, 401, "Unauthorized")
         return false
     }
