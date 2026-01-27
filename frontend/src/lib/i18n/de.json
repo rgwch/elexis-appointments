@@ -31,8 +31,13 @@
   "remove_selected_appointment": "Ausgewählten Termin absagen",
   "remove_selected_appointments": "{number} Ausgewählte Termine absagen",
   "search_appointment": "Termin vereinbaren",
+  "send_mail": "Bestätigung mailen",
   "select_appointment": "Termin wählen",
   "select_appointments_to_remove": "Wählen Sie die Termine aus, die Sie absagen möchten:",
   "select_date": "Datum auswählen:",
-  "yourappointments": "Ihre Termine"
+  "yourappointments": "Ihre Termine",
+  "2nd_factor_required": "Vertrauliche Daten. Dafür ist Mail-Authentifizierung erforderlich. Wenn Sie ok klicken, erhalten Sie eine Mail mit einem Link zu dieser Seite.",
+  "check_email_for_token": "Mail gesendet. Bitte überprüfen Sie Ihr Postfach und klicken Sie auf den Link in der Mail, um fortzufahren.",
+  "error_sending_2nd_factor": "Fehler beim Senden der Authentifizierungs-Mail. Bitte versuchen Sie es später erneut.",
+  "request_failed_with_status": "Anfrage fehlgeschlagen mit Status {status}."
 }

@@ -157,7 +157,7 @@ async function doFetch(url: string, body?: any): Promise<any> {
                     throw new Error("2nd factor required")
                 }
             }
-            throw new Error(`Request failed with status ${response.status}`)
+            throw new Error(trl("request_failed_with_status", { values: { status: response.status } }))
         }
     } catch (e) {
         console.error("Error during doFetch:", e)

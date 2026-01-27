@@ -41,7 +41,14 @@ server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
         return false
     }
     const { token, validUntil } = MikroRest.createJWT({ ...user, verified: true })
-    await sendToken(user.mail, token, validUntil);
+    try {
+        await sendToken(user.mail, token, validUntil);
+        server.sendJson(res, { success: true })
+    } catch (e) {
+        console.error("Error sending token mail:", e)
+        server.error(res, 500, "Internal server error")
+        return false
+    }
     return false
 })
 
@@ -152,7 +159,15 @@ server.addRoute("get", "/api/sendconfirmation", server.authorize, async (req, re
     if (!id) {
         server.error(res, 400, "Missing id parameter")
         return false
-    } await sendMail(id)
+    }
+    try {
+        await sendMail(id)
+        server.sendJson(res, { success: true })
+    } catch (e) {
+        console.error("Error in /api/sendconfirmation:", e)
+        server.error(res, 500, "Internal server error")
+        return false
+    }
     return false
 })
 
