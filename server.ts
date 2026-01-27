@@ -75,7 +75,7 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
 server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
     const startMinute = body.startMinute
-    const duration = body.duration || parseInt(process.env.defaultAppointmentDuration || "15")
+    const reason = body.reason || ""
     const patId = body.patId
     const date = body.date
     if (startMinute === undefined || patId === undefined || !date) {
@@ -83,7 +83,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
         return false
     }
     try {
-        const termin = await takeSlot(date, startMinute, duration, patId)
+        const termin = await takeSlot(date, startMinute, reason, patId)
         server.sendJson(res, termin)
         return false
     } catch (e) {

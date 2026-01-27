@@ -95,16 +95,26 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
  * @param patId 
  * @returns a Termin object representing the booked appointment or null if booking failed
  */
-export async function takeSlot(date: string, startMinute: number, duration: number, patId: string): Promise<termin> {
+export async function takeSlot(date: string, startMinute: number, reason: string, patId: string): Promise<termin> {
     const db = new SQL(process.env.database!)
     const currentTime = Math.round(new Date().getTime() / 60000).toString();
     const id = Math.random().toString(36).substring(2, 10);
+    const duration = parseInt(process.env.defaultAppointmentDuration || "15");  
     try {
         const result = await db`
-        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, deleted, patid,angelegt,erstelltvon, termintyp, terminstatus) 
-        VALUES (${id}, ${process.env.bereich || "Arzt"}, 
-        ${elexisdateFromDate(new Date(date))}, ${startMinute}, ${duration}, "0", ${patId} , ${currentTime}, 
-        "internet", ${process.env.TerminTyp || "Normal"}, ${process.env.CreatedState || "geplant"})
+        INSERT INTO agntermine (id, bereich, tag, beginn, dauer, grund, deleted, patid,angelegt,erstelltvon, termintyp, terminstatus) 
+        VALUES (${id}, 
+        ${process.env.bereich || "Arzt"}, 
+        ${elexisdateFromDate(new Date(date))}, 
+        ${startMinute}, 
+        ${duration}, 
+        ${reason}, 
+        "0", 
+        ${patId} ,
+         ${currentTime}, 
+        "internet", 
+        ${process.env.TerminTyp || "Normal"}, 
+        ${process.env.CreatedState || "geplant"})
     `
         return {
             id: id,
@@ -112,6 +122,7 @@ export async function takeSlot(date: string, startMinute: number, duration: numb
             tag: elexisdateFromDate(new Date(date)),
             beginn: startMinute.toString(),
             dauer: duration.toString(),
+            grund: reason,
             termintyp: process.env.TerminTyp || "Normal",
             deleted: "0",
         }
@@ -209,7 +220,7 @@ export async function sendMail(id: string) {
             port: parseInt(process.env.SMTP_PORT || "465"),
             user: process.env.SMTP_USER,
             pwd: process.env.SMTP_PASSWORD
-        }, process.env.MAIL_FROM || "")
+        }, process.env.EMAIL_FROM || "")
         const appointmentDate = new Date(
             parseInt(appointment.tag.substring(0, 4)),
             parseInt(appointment.tag.substring(4, 6)) - 1,
@@ -218,8 +229,8 @@ export async function sendMail(id: string) {
             parseInt(appointment.beginn) % 60
         )
 
-        const dateStr = appointmentDate.toLocaleDateString()
-        const timeStr = appointmentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        const dateStr = appointmentDate.toLocaleDateString("de-CH")
+        const timeStr = appointmentDate.toLocaleTimeString("de-CH", { hour: '2-digit', minute: '2-digit' })
 
         const icalConfig = getICalConfig()
         const cal = ical({ "prodId": icalConfig.prodId, "name": icalConfig.summary })
@@ -230,7 +241,7 @@ export async function sendMail(id: string) {
             description: renderICalDescription({ date: dateStr, time: timeStr }),
             organizer: {
                 name: icalConfig.organizerName,
-                email: process.env.MAIL_FROM || ""
+                email: process.env.EMAIL_FROM || ""
             }
         })
         const icalString = cal.toString()
@@ -249,6 +260,10 @@ export async function sendMail(id: string) {
             undefined,
             icalString
         )
+        if(result.error){
+            console.log(result)
+            throw new Error(`Error sending email: ${result.error}`)
+        }
         console.log(`Email sent to ${patient.email} for appointment ${id}`);
     } catch (e) {
         console.error("Error sending mail:", e)

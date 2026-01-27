@@ -107,11 +107,10 @@
         message = '';
 
         try {
-            const duration = 30; // Default duration, adjust as needed
             createdAppointment = await bookAppointment(
                 new Date(selectedDate),
                 selectedSlot,
-                duration,
+                appointmentReason.trim(),
             );
 
             if (createdAppointment?.id) {

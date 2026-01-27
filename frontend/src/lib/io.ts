@@ -164,12 +164,12 @@ async function doFetch(url: string, body?: any): Promise<any> {
         throw e
     }
 }
-export async function bookAppointment(date: Date, startMinute: number, duration: number): Promise<termin> {
+export async function bookAppointment(date: Date, startMinute: number, reason: string): Promise<termin> {
     const headers = createHeader()
     const body = {
         date: date.toISOString(),
         startMinute,
-        duration,
+        reason,
         patId: user.id
     }
     try {
