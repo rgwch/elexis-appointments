@@ -51,6 +51,7 @@
   <button onclick={() => $locale = 'pt'}>PT</button>
   <button onclick={() => $locale = 'ru'}>RU</button>
   <button onclick={() => $locale = 'sr'}>SR</button>
+  <button onclick={() => $locale = 'ta'}>TA</button>
 </div>
 </div>
 

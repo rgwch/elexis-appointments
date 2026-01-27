@@ -7,6 +7,7 @@ register('it', () => import('./it.json'));
 register('pt', () => import('./pt.json'));
 register('ru', () => import('./ru.json'));
 register('sr', () => import('./sr.json'));
+register('ta', () => import('./ta.json'));
 
 const initialLocale = getLocaleFromNavigator() || 'de';
 
