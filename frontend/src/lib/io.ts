@@ -149,15 +149,16 @@ async function doFetch(url: string, body?: any): Promise<any> {
             } else if (response.status === 420) {
                 if (window.confirm(trl("2nd_factor_required"))) {
                     const resp = await doFetch("/api/sendtoken");
-                    if (resp.ok) {
+                    if (resp?.success) {
                         alert(trl("check_email_for_token"))
                     } else {
                         alert(trl("error_sending_2nd_factor"))
+                        throw new Error("2nd factor required")
                     }
-                    throw new Error("2nd factor required")
                 }
+            } else {
+                throw new Error(trl("request_failed_with_status", { values: { status: response.status } }))
             }
-            throw new Error(trl("request_failed_with_status", { values: { status: response.status } }))
         }
     } catch (e) {
         console.error("Error during doFetch:", e)
