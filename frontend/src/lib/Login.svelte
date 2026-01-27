@@ -1,11 +1,13 @@
 <script lang="ts">
     import { _ } from 'svelte-i18n';
     import { checkAccess } from './io';
+    import LocalizedContent from './LocalizedContent.svelte';
     let { mode = $bindable() } = $props();
     let email: string = $state('');
     let birthdate: string = $state('');
     let errorMsg = $state('');
     let checking = $state(false);
+    let showModal = $state(false);
 
     async function handleCheckAccess() {
         if (!email || !birthdate) {
@@ -90,7 +92,32 @@
             {$_('login')}
         {/if}
     </button>
+
+    <div class="info-link-container">
+        <button class="info-link" onclick={() => showModal = true}>
+            {$_('more_information')}
+        </button>
+    </div>
 </div>
+
+{#if showModal}
+    <div class="modal-overlay" onclick={() => showModal = false}>
+        <div class="modal-content" onclick={(e) => e.stopPropagation()}>
+            <div class="modal-header">
+                <h2>{$_('more_information')}</h2>
+                <button class="modal-close" onclick={() => showModal = false}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <LocalizedContent contentType="disclaimer" />
+            </div>
+        </div>
+    </div>
+{/if}
 
 <style>
     .info-text {
@@ -147,5 +174,92 @@
         margin-bottom: 1rem;
         font-size: 0.9rem;
         border-left: 4px solid #fc8181;
+    }
+
+    .info-link-container {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .info-link {
+        background: none;
+        border: none;
+        color: #667eea;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 0.5rem;
+        transition: color 0.2s;
+    }
+
+    .info-link:hover {
+        color: #5a67d8;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #2d3748;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+    }
+
+    .modal-close:hover {
+        background-color: #f7fafc;
+    }
+
+    .modal-close svg {
+        width: 24px;
+        height: 24px;
+        color: #4a5568;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
     }
 </style>
