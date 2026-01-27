@@ -3,7 +3,7 @@
   import Login from './lib/Login.svelte';
   import Remove from './lib/Remove.svelte';
   import Select from './lib/Select.svelte';
-  import { _ } from 'svelte-i18n';
+  import { _,locale } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { verifyEmailToken } from './lib/io';
   let hasAccess = false;
@@ -43,6 +43,15 @@
   {:else if mode === 'select'}
     <Select bind:mode />
   {/if}
+  <div>
+  <button onclick={() => $locale = 'de'}>DE</button>
+  <button onclick={() => $locale = 'en'}>EN</button>
+  <button onclick={() => $locale = 'fr'}>FR</button>
+  <button onclick={() => $locale = 'it'}>IT</button>
+  <button onclick={() => $locale = 'pt'}>PT</button>
+  <button onclick={() => $locale = 'ru'}>RU</button>
+  <button onclick={() => $locale = 'sr'}>SR</button>
+</div>
 </div>
 
 <style>
