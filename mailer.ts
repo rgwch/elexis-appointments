@@ -53,18 +53,18 @@ export class Mailer {
             subject: subject,
             text: contents,
         }
-        /*
+        
         if (ical) {
             message['icalEvent'] = {
                 filename: 'arzttermin.ics',
                 method: 'publish',
                 content: ical,
             }
-        }
+        } 
         if (attachment) {
             message['attachments'] = [attachment]
         }
-            */
+        
         try {
             const result = await this.transporter.sendMail(message)
             return result

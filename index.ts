@@ -177,7 +177,7 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
         port: parseInt(process.env.SMTP_PORT || "465"),
         user: process.env.SMTP_USER,
         pwd: process.env.SMTP_PASSWORD
-    }, process.env.MAIL_FROM || "")
+    }, process.env.EMAIL_FROM || "")
 
     const { subject, body } = getTokenEmail({
         verificationLink: `${process.env.URL}?token=${token}`,
@@ -190,6 +190,10 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
             subject,
             body
         )
+        if(result.error){
+            console.log(result)
+            throw new Error(`Error sending email: ${result.error}`)
+        }
         console.log(`Sent token email to ${mail}`);
     } catch (e) {
         console.error("Error sending token email:", e)
@@ -247,9 +251,9 @@ export async function sendMail(id: string) {
         const icalString = cal.toString()
 
         const { subject, body } = getConfirmationEmail({
-            salutation: patient.bezeichnung2,
-            lastname: patient.bezeichnung1,
-            firstname: patient.bezeichnung2,
+            salutation: "",
+            lastname: patient.bezeichnung2,
+            firstname: patient.bezeichnung1,
             date: dateStr,
             time: timeStr
         })

@@ -8,9 +8,9 @@
     "body": "Sehr geehrte/r {{salutation}} {{lastname}} {{firstname}},\n\nhiermit bestätigen wir Ihren Termin am {{date}} um {{time}} Uhr.\n\nBitte denken Sie daran, uns rechtzeitig zu informieren, falls Sie den Termin nicht wahrnehmen können.\n\nFreundliche Grüsse\nIhre Praxis"
   },
   "ical": {
-    "summary": "Arzttermin",
-    "description": "Ihr Termin in der Praxis am {{date}} um {{time}} Uhr.",
-    "organizerName": "Praxis",
+    "summary": "Arzttermin Praxis Breite",
+    "description": "Ihr Termin in der Praxis Breite am {{date}} um {{time}} Uhr.",
+    "organizerName": "Praxis Breite",
     "prodId": "elexis-appointments"
   }
 }
