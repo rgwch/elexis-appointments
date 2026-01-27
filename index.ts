@@ -181,7 +181,7 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
 
     const { subject, body } = getTokenEmail({
         verificationLink: `${process.env.URL}?token=${token}`,
-        validUntil: validUntil.toLocaleString()
+        validUntil: validUntil.toLocaleString("de-CH")
     })
 
     try {
