@@ -17,6 +17,7 @@
   "checking": "Überprüfen...",
   "email_label": "E-Mail-Adresse",
   "email_placeholder": "ihre@email.com",
+  "email_sent_confirmation": "Bestätigungsmail wurde gesendet.",
   "error_booking": "Fehler beim Buchen des Termins",
   "error_deleting_appointments": "Fehler beim Löschen der Termine",
   "error_loading_slots": "Fehler beim Laden der freien Termine",
@@ -25,6 +26,7 @@
   "internal_server_error": "Ohje: Interner Serverfehler. Bitte versuchen Sie es in einigen Stunden wieder.",
   "loading": "Laden...",
   "login": "Anmelden",
+  "logout": "Abmelden",
   "more_information": "Weitere Informationen",
   "no_slots_available": "Keine freien Termine für dieses Datum verfügbar",
   "noappointments": "Keine Termine gefunden.",
@@ -40,7 +42,5 @@
   "select_appointments_to_remove": "Wählen Sie die Termine aus, die Sie absagen möchten:",
   "select_date": "Datum auswählen:",
   "send_mail": "Bestätigung mailen",
-  "yourappointments": "Ihre Termine",
-  "email_sent_confirmation": "Bestätigungsmail wurde gesendet.",
-  "logout": "Abmelden"
+  "yourappointments": "Ihre Termine"
 }

@@ -53,3 +53,58 @@ There's no big performance or usage difference in running the exectutable or run
 * Edit the files in frontend/src/lib/content as needed.
 
 * Edit frontend/src/lib/i18n/i18n.ts if more, less, or other languages are needed. Currently, the app is based on german and translated to english, french, italian, portuguese, russian, serbian, and tamil.
+
+## Integration
+
+Here's an example configuration for apache2:
+
+
+/etc/apache2/sites-available/elexistermine.conf
+```apache
+<VirtualHost *:80>
+        ServerName termine.myserver.ch
+        ProxyPass / http://elexisapps:3349/
+        ProxyPassReverse / http://elexisapps:3349/
+        RewriteEngine on
+        RewriteCond %{SERVER_NAME} =termine.myserver.ch
+        RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+        <VirtualHost *:443>
+                ServerName termine.myserver.ch
+                ProxyPass / http://elexisapps:3349/
+                ProxyPassReverse / http://elexisapps:3349/
+
+                SSLCertificateFile /etc/letsencrypt/live/termine.elexisapps.ch/fullchain.pem
+                SSLCertificateKeyFile /etc/letsencrypt/live/termine.elexisapps.ch/privkey.pem
+                Include /etc/letsencrypt/options-ssl-apache.conf
+        </VirtualHost>
+</IfModule>
+```
+This config
+
+* expects that you have set up a domain `termine.myserver.ch` with your domain registrar that points to the public address of your router (either aquired with a dynamic dns service or with a static IP)
+* expects that you get ssl certificates with the letsencrypt certbot (see below).
+* expects that the router forwards calls to port 80 to the host running apache.
+* expects that elexis-appointments runs on a host 'elexisapps' and uses port 3349.
+* enforces encrypted ssl (https://) connections
+
+### SSL certificates
+
+It is highly recommended to allow connections to your appointment service only via encrypted channesls, i.e. SSL / HTTPS.
+
+Set up for letsencrypt certificates is easy:
+
+* make the system work for unencrypted connections (domain, port forwarding and so on)
+
+Then:
+
+```bash
+sudo apt install certbot
+sudo certbot --apache
+```
+and select the sites you want to secure.
+
+That's all. Certbot will manage and update the certificates as needed.
+
