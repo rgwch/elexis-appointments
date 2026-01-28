@@ -14,7 +14,7 @@ Medical appointment booking system with Bun runtime backend and Svelte 5 fronten
 
 ### Frontend (`/frontend/`)
 - **Framework**: Svelte 5 + TypeScript + Vite
-- **I18n**: svelte-i18n with JSON files in `src/lib/i18n/` (de, en, fr, it, pt, ru, sr)
+- **I18n**: svelte-i18n with JSON files in `src/lib/i18n/` (de, en, fr, it, pt, ru, sr, ta)
 - **Build**: Vite builds to `frontend/dist`, served statically by backend
 
 ### Database Integration
@@ -41,9 +41,12 @@ cd frontend && bun run dev
 cd frontend && bun install && bun run build
 cd ..
 
-# Create standalone executable
+# Create standalone executables
 bun install
-bun build ./index.ts --compile --outfile termine
+bun build --compile --minify --target=bun-linux-x64 ./index.ts --outfile termine-linux-x64
+bun build --compile --minify --target=bun-windows-x64 ./index.ts --outfile termine-windows-x64
+bun build --compile --minify --target=bun-darwin-x64 ./index.ts --outfile termine-macos-x64
+bun build --compile --minify --target=bun-darwin-arm64 ./index.ts --outfile termine-macos-arm64
 ```
 
 ### Testing Changes
@@ -165,8 +168,14 @@ All endpoints except `/api/checkaccess` require JWT authentication via `server.a
 
 ### Frontend Translations
 1. Add key to `frontend/src/lib/i18n/de.json` (primary language)
-2. Run `bun run i18n` from frontend directory to sync to other languages
+2. Run `bun run i18n` from frontend directory to sync to other languages (en, fr, it, pt, ru, sr, ta)
 3. Use `$_('key')` in Svelte components to access translations
+
+### Content Management
+- Disclaimer files in `frontend/src/lib/content/` for all supported languages
+- All disclaimer files should have consistent structure with translation note and copyright
+- Primary language is German (`disclaimer.de.md`) - other languages are machine translations
+- Translation note explains that translations are automated and encourages error reporting
 
 ### Email Templates
 - Email content configured in `email-templates.json` (customizable via `EMAIL_TEMPLATES_PATH` env var)
