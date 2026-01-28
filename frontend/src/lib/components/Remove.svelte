@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { findAppointments, formatTime, removeAppointment } from './io';
-    import type { termin } from '../../../types.d';
+    import { findAppointments, formatTime, removeAppointment } from '../io';
+    import type { termin } from '../../../../types';
     import { DateTime } from 'luxon';
     import { _ } from 'svelte-i18n';
     let { mode = $bindable() } = $props();

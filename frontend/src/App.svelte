@@ -1,8 +1,8 @@
 <script lang="ts">
-  import Appointments from './lib/Appointments.svelte';
-  import Login from './lib/Login.svelte';
-  import Remove from './lib/Remove.svelte';
-  import Select from './lib/Select.svelte';
+  import Appointments from './lib/components/Appointments.svelte';
+  import Login from './lib/components/Login.svelte';
+  import Remove from './lib/components/Remove.svelte';
+  import Select from './lib/components/Select.svelte';
   import { _,locale } from 'svelte-i18n';
   import { onMount } from 'svelte';
   import { verifyEmailToken } from './lib/io';

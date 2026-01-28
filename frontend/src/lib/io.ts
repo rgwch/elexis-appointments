@@ -10,6 +10,62 @@ _.subscribe((value) => {
     trl = value
 })
 
+
+/**
+ * Call an endpoint with optional body.Set Authorization header if jwtToken is set.
+ * Handle common error codes.
+ * Handle special case of 2nd factor authentication.
+ * @param url local part of the url
+ * @param body if set, a POST request is made with the body as JSON, otherwise a GET request is made
+ * @returns the parsed JSON response or null
+ */
+async function doFetch(url: string, body?: any): Promise<any> {
+    const headers = createHeader()
+    const options: RequestInit = {
+        method: body ? "POST" : "GET",
+        headers,
+    }
+    if (body) {
+        options.body = JSON.stringify(body)
+    }
+    try {
+        const response = await fetch(baseURL + url, options)
+        if (response.ok) {
+            if (response.body) {
+                return await response.json()
+            } else {
+                return null
+            }
+        } else {
+            if (response.status === 401) {
+                logout();
+                alert(trl("expired"))
+            } else if (response.status === 500) {
+                alert(trl("internal_server_error"))
+            } else if (response.status === 420) {
+                if (window.confirm(trl("2nd_factor_required"))) {
+                    const resp = await doFetch("/api/sendtoken");
+                    if (resp?.success) {
+                        alert(trl("check_email_for_token"))
+                    } else {
+                        alert(trl("error_sending_2nd_factor"))
+                        throw new Error("2nd factor required")
+                    }
+                }
+            } else {
+                throw new Error(trl("request_failed_with_status", { values: { status: response.status } }))
+            }
+        }
+    } catch (e) {
+        console.error("Error during doFetch:", e)
+        throw e
+    }
+}
+
+export function logout(){
+    jwtToken = null
+    user = null
+}
 export function formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -122,49 +178,7 @@ export const findPrevPossibleDate = async (startDate: Date): Promise<Date> => {
     throw new Error("No available dates in the previous 30 days")
 }
 
-async function doFetch(url: string, body?: any): Promise<any> {
-    const headers = createHeader()
-    const options: RequestInit = {
-        method: body ? "POST" : "GET",
-        headers,
-    }
-    if (body) {
-        options.body = JSON.stringify(body)
-    }
-    try {
-        const response = await fetch(baseURL + url, options)
-        if (response.ok) {
-            if (response.body) {
-                return await response.json()
-            } else {
-                return null
-            }
-        } else {
-            if (response.status === 401) {
-                jwtToken = null
-                user = null
-                alert(trl("expired"))
-            } else if (response.status === 500) {
-                alert(trl("internal_server_error"))
-            } else if (response.status === 420) {
-                if (window.confirm(trl("2nd_factor_required"))) {
-                    const resp = await doFetch("/api/sendtoken");
-                    if (resp?.success) {
-                        alert(trl("check_email_for_token"))
-                    } else {
-                        alert(trl("error_sending_2nd_factor"))
-                        throw new Error("2nd factor required")
-                    }
-                }
-            } else {
-                throw new Error(trl("request_failed_with_status", { values: { status: response.status } }))
-            }
-        }
-    } catch (e) {
-        console.error("Error during doFetch:", e)
-        throw e
-    }
-}
+
 export async function bookAppointment(date: Date, startMinute: number, reason: string): Promise<termin> {
     const headers = createHeader()
     const body = {

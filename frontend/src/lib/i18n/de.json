@@ -41,5 +41,6 @@
   "select_date": "Datum auswählen:",
   "send_mail": "Bestätigung mailen",
   "yourappointments": "Ihre Termine",
-  "email_sent_confirmation": "Bestätigungsmail wurde gesendet."
+  "email_sent_confirmation": "Bestätigungsmail wurde gesendet.",
+  "logout": "Abmelden"
 }

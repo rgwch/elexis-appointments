@@ -6,8 +6,8 @@
         findPrevPossibleDate,
         formatTime,
         sendConfirmationMail,
-    } from './io';
-    import type { termin } from '../../../types.d';
+    } from '../io';
+    import type { termin } from '../../../../types';
     import { _, locale } from 'svelte-i18n';
     import { DateTime } from 'luxon';
 

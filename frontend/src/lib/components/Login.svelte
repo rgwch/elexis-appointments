@@ -1,6 +1,6 @@
 <script lang="ts">
     import { _ } from 'svelte-i18n';
-    import { checkAccess } from './io';
+    import { checkAccess } from '../io';
     import LocalizedContent from './LocalizedContent.svelte';
     let { mode = $bindable() } = $props();
     let email: string = $state('');

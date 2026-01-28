@@ -1,16 +1,20 @@
 <script lang="ts">
-    import { _ } from 'svelte-i18n';
+    import { _ } from "svelte-i18n";
+    import {logout} from '../io';
     let { mode = $bindable() } = $props();
 </script>
 
 <div class="card">
-    <p class="info-text">{$_('please_choose_option')}</p>
+    <p class="info-text">{$_("please_choose_option")}</p>
     <div class="options">
-        <button class="option-btn" onclick={() => (mode = 'book')}>
-            {$_('search_appointment')}
+        <button class="option-btn" onclick={() => (mode = "book")}>
+            {$_("search_appointment")}
         </button>
-        <button class="option-btn" onclick={() => (mode = 'display')}>
-            {$_('remove_appointment')}
+        <button class="option-btn" onclick={() => (mode = "display")}>
+            {$_("remove_appointment")}
+        </button>
+        <button class="option-btn" style="margin-top:12px;" onclick={() => {logout(); (mode = "login")}}>
+            {$_("logout")}
         </button>
     </div>
 </div>
