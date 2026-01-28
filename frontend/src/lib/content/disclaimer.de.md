@@ -16,6 +16,8 @@ Manche Optionen, wie etwa das Auflisten und Absagen Ihrer bestehenden Termine, s
 
 Wenn Sie mit diesen Bedingungen nicht einverstanden sind, dürfen Sie dieses Tool nicht benutzen. Bitte vereinbaren Sie Ihren Termin in diesem Fall telefonisch.
 
+Anmerkung, falls Sie diesen Text nicht auf deutsch lesen: Die Übersetzungen erfolgten maschinell. Bitte seien Sie nachsichtig bei Fehlern (aber Sie dürfen Fehler gerne melden, am liebsten gleich mit einem Korrekturvorschlag).
+
 Bitte wenden Sie sich mit allen Fragen und Anregungen zu diesem Programm an praxis@weirich.ch.
 
 <small>&copy; 2026 by G. Weirich</small>

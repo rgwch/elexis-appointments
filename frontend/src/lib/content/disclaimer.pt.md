@@ -16,6 +16,8 @@ Algumas opções, como listar e cancelar suas consultas existentes, são protegi
 
 Se você não concordar com essas condições, não poderá usar esta ferramenta. Nesse caso, por favor, marque sua consulta por telefone.
 
+Nota, se você não está lendo este texto em alemão: As traduções foram feitas automaticamente. Por favor, seja tolerante com erros (mas você pode relatar erros, preferencialmente com uma sugestão de correção).
+
 Por favor, entre em contato com praxis@weirich.ch para todas as perguntas e sugestões sobre este programa.
 
 <small>&copy; 2026 por G. Weirich</small>

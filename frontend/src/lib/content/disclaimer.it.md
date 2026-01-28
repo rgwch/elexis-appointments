@@ -16,6 +16,8 @@ Alcune opzioni, come la visualizzazione e la cancellazione dei vostri appuntamen
 
 Se non siete d'accordo con queste condizioni, non potete utilizzare questo strumento. In questo caso, vi preghiamo di fissare il vostro appuntamento telefonicamente.
 
+Nota, se non state leggendo questo testo in tedesco: Le traduzioni sono state effettuate automaticamente. Vi preghiamo di essere indulgenti con gli errori (ma potete segnalare gli errori, preferibilmente con un suggerimento di correzione).
+
 Vi preghiamo di rivolgervi a praxis@weirich.ch per tutte le domande e i suggerimenti riguardanti questo programma.
 
 <small>&copy; 2026 di G. Weirich</small>

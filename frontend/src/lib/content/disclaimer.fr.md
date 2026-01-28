@@ -16,6 +16,8 @@ Certaines options, comme la consultation et l'annulation de vos rendez-vous exis
 
 Si vous n'êtes pas d'accord avec ces conditions, vous ne devez pas utiliser cet outil. Dans ce cas, veuillez prendre rendez-vous par téléphone.
 
+Remarque, si vous ne lisez pas ce texte en allemand : Les traductions ont été effectuées par machine. Veuillez être indulgent avec les erreurs (mais vous pouvez signaler les erreurs, de préférence avec une suggestion de correction).
+
 Veuillez adresser toutes vos questions et suggestions concernant ce programme à praxis@weirich.ch.
 
 <small>&copy; 2026 par G. Weirich</small>

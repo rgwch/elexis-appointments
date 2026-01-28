@@ -16,6 +16,8 @@ Some options, such as listing and canceling your existing appointments, are prot
 
 If you do not agree with these conditions, you may not use this tool. In this case, please make your appointment by phone.
 
+Note, if you are not reading this text in German: The translations were done by machine. Please be lenient with errors (but you are welcome to report errors, preferably with a correction suggestion).
+
 Please contact praxis@weirich.ch with all questions and suggestions about this program.
 
 <small>&copy; 2026 by G. Weirich</small>

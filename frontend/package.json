@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
-    "i18n": "sync-i18n --files '**/i18n/*.json' --primary de --languages en fr it pt --space 2"
+    "i18n": "sync-i18n --files '**/i18n/*.json' --primary de --languages en fr it pt ru sr ta --space 2"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
