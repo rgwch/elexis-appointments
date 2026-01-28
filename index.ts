@@ -51,7 +51,15 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
         });
 
         const freeSlots = new Set<number>();
-        const workStart = parseInt(process.env.workStart || "8") * 60;
+        //let workStart = parseInt(process.env.workStart || "8") * 60;
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        const workStart = isToday
+            ? Math.max(
+                parseInt(process.env.workStart || "8") * 60,
+                now.getHours() * 60 + now.getMinutes() + 60
+            )
+            : parseInt(process.env.workStart || "8") * 60;
         const workEnd = parseInt(process.env.workEnd || "18") * 60;
 
         for (let minute = workStart; minute < workEnd; minute++) {
