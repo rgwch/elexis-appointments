@@ -7,7 +7,7 @@ Elexis-Appointments is a tool to allow patients of an Elexis-operated practice t
 ### Prerequisites
 
 * A running Elexis database. For security reasons, It is recommended to run this tool not on the main Elexis-Server.
-* A database user with (at least) read and write privileges to "agntermine" and with read privilege on "kontakt". For security reasons, it is recommended to create a specific user for this tool with the least possible privileges.
+* A database user with (at least) SELECT,INSERT,UPDATE privileges on "agntermine" and with SELECT privilege on "kontakt". For security reasons, it is recommended to create a specific user for this tool with the least possible privileges.
 * [Bun](https://bun.sh/) v. 1.3.6 or higher
 * A domain name pointing to your router and a port forwarding from your router to the configured port of the computer running this app. If you have more than one webservice, you'll need a reverse proxy. See below for an example Apache2 configuration.
 
