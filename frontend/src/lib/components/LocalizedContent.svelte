@@ -10,14 +10,14 @@
         const currentLocale = $locale || 'de';
         loading = true;
 
-        import(`./content/${contentType}.${currentLocale}.md?raw`)
+        import(`../content/${contentType}.${currentLocale}.md?raw`)
             .then((module) => {
                 content = module.default;
                 loading = false;
             })
             .catch(() => {
                 // Fallback to German if locale file doesn't exist
-                import(`./content/${contentType}.de.md?raw`)
+                import(`../content/${contentType}.de.md?raw`)
                     .then((module) => {
                         content = module.default;
                         loading = false;
