@@ -36,11 +36,13 @@
   "remove_appointment": "Termin anzeigen / absagen",
   "remove_selected_appointment": "Ausgewählten Termin absagen",
   "remove_selected_appointments": "{number} Ausgewählte Termine absagen",
-  "request_failed_with_status": "Anfrage fehlgeschlagen mit Status {status}.",
+  "request_failed_with_status": "Anfrage fehlgeschlagen mit Status {status}",
   "search_appointment": "Termin vereinbaren",
   "select_appointment": "Termin wählen",
   "select_appointments_to_remove": "Wählen Sie die Termine aus, die Sie absagen möchten:",
   "select_date": "Datum auswählen:",
   "send_mail": "Bestätigung mailen",
+  "system_unavailable": "System derzeit nicht verfügbar",
+  "system_unavailable_message": "Das Terminsystem ist momentan nicht erreichbar. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns telefonisch.",
   "yourappointments": "Ihre Termine"
 }

@@ -42,5 +42,7 @@
   "select_appointments_to_remove": "Sélectionnez les rendez-vous que vous souhaitez annuler :",
   "select_date": "Sélectionner une date :",
   "send_mail": "Envoyer la confirmation",
+  "system_unavailable": "Système actuellement indisponible",
+  "system_unavailable_message": "Le système de rendez-vous est actuellement inaccessible. Veuillez réessayer plus tard ou nous contacter par téléphone.",
   "yourappointments": "Vos rendez-vous"
 }

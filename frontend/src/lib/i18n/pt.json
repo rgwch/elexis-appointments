@@ -42,5 +42,7 @@
   "select_appointments_to_remove": "Selecione as consultas que deseja cancelar:",
   "select_date": "Selecione uma data:",
   "send_mail": "Enviar confirmação",
+  "system_unavailable": "Sistema atualmente indisponível",
+  "system_unavailable_message": "O sistema de agendamento de consultas está atualmente inacessível. Por favor, tente novamente mais tarde ou entre em contato conosco por telefone.",
   "yourappointments": "Suas consultas"
 }

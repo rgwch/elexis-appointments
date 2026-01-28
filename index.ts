@@ -5,6 +5,21 @@ import { Mailer } from "./mailer"
 import ical from "ical-generator"
 import { getTokenEmail, getConfirmationEmail, getICalConfig, renderICalDescription } from "./email-templates"
 
+/**
+ * Check if the database server is alive
+ * @returns true if database is reachable, false otherwise
+ */
+export async function isDatabaseAlive(): Promise<boolean> {
+    try {
+        const db = new SQL(process.env.database!);
+        await db`SELECT 1`;
+        db.close();
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
 function elexisdateFromDate(date: Date): string {
     const day = date.getDate()
     const month = date.getMonth() + 1
@@ -99,7 +114,7 @@ export async function takeSlot(date: string, startMinute: number, reason: string
     const db = new SQL(process.env.database!)
     const currentTime = Math.round(new Date().getTime() / 60000).toString();
     const id = Math.random().toString(36).substring(2, 10);
-    const duration = parseInt(process.env.defaultAppointmentDuration || "15");  
+    const duration = parseInt(process.env.defaultAppointmentDuration || "15");
     try {
         const result = await db`
         INSERT INTO agntermine (id, bereich, tag, beginn, dauer, grund, deleted, patid,angelegt,erstelltvon, termintyp, terminstatus) 
@@ -190,7 +205,7 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
             subject,
             body
         )
-        if(result.error){
+        if (result.error) {
             console.log(result)
             throw new Error(`Error sending email: ${result.error}`)
         }
@@ -264,7 +279,7 @@ export async function sendMail(id: string) {
             undefined,
             icalString
         )
-        if(result.error){
+        if (result.error) {
             console.log(result)
             throw new Error(`Error sending email: ${result.error}`)
         }

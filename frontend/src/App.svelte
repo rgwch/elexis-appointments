@@ -3,15 +3,21 @@
   import Login from './lib/components/Login.svelte';
   import Remove from './lib/components/Remove.svelte';
   import Select from './lib/components/Select.svelte';
-  import { _,locale } from 'svelte-i18n';
+  import { _, locale } from 'svelte-i18n';
   import { onMount } from 'svelte';
-  import { verifyEmailToken } from './lib/io';
+  import { verifyEmailToken, checkHealth } from './lib/io';
   let hasAccess = false;
   let mode: 'login' | 'select' | 'book' | 'display' = 'login';
+  let systemAvailable = true;
+  let checkingHealth = true;
   if (window.location.pathname.startsWith('/manage/')) {
     mode = 'display';
   }
   onMount(async () => {
+    // Check system health first
+    systemAvailable = await checkHealth();
+    checkingHealth = false;
+
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
@@ -34,7 +40,16 @@
     <h1>{$_('app_title')}</h1>
   </div>
 
-  {#if mode === 'login'}
+  {#if checkingHealth}
+    <div class="info-message">
+      <p>{$_('checking')}</p>
+    </div>
+  {:else if !systemAvailable}
+    <div class="error-message">
+      <h2>{$_('system_unavailable')}</h2>
+      <p>{$_('system_unavailable_message')}</p>
+    </div>
+  {:else if mode === 'login'}
     <Login bind:mode></Login>
   {:else if mode === 'display'}
     <Remove bind:mode />
@@ -44,15 +59,15 @@
     <Select bind:mode />
   {/if}
   <div>
-  <button onclick={() => $locale = 'de'}>DE</button>
-  <button onclick={() => $locale = 'en'}>EN</button>
-  <button onclick={() => $locale = 'fr'}>FR</button>
-  <button onclick={() => $locale = 'it'}>IT</button>
-  <button onclick={() => $locale = 'pt'}>PT</button>
-  <button onclick={() => $locale = 'ru'}>RU</button>
-  <button onclick={() => $locale = 'sr'}>SR</button>
-  <button onclick={() => $locale = 'ta'}>TA</button>
-</div>
+    <button onclick={() => ($locale = 'de')}>DE</button>
+    <button onclick={() => ($locale = 'en')}>EN</button>
+    <button onclick={() => ($locale = 'fr')}>FR</button>
+    <button onclick={() => ($locale = 'it')}>IT</button>
+    <button onclick={() => ($locale = 'pt')}>PT</button>
+    <button onclick={() => ($locale = 'ru')}>RU</button>
+    <button onclick={() => ($locale = 'sr')}>SR</button>
+    <button onclick={() => ($locale = 'ta')}>TA</button>
+  </div>
 </div>
 
 <style>
@@ -82,6 +97,30 @@
   .header {
     text-align: center;
     margin-bottom: 2rem;
+  }
+
+  .error-message {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .error-message h2 {
+    color: #ffcc00;
+    margin-bottom: 1rem;
+  }
+
+  .info-message {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    text-align: center;
   }
 
   .cancel-btn {

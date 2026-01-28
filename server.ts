@@ -1,7 +1,7 @@
 import { MikroRest } from '@rgwch/mikrorest'
 import {
     checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,
-    sendMail, takeSlot, sendToken
+    sendMail, takeSlot, sendToken, isDatabaseAlive
 } from "./index"
 import { decode } from 'node:punycode';
 
@@ -11,6 +11,19 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development"
 const server = new MikroRest({ port, allowedOriginsProd: [`http://localhost:${port}`, ""] })
 
 server.addStaticDir("./frontend/dist")
+
+/**
+ * Health check endpoint
+ */
+server.addRoute("get", "/api/health", async (req, res) => {
+    const dbAlive = await isDatabaseAlive();
+    if (dbAlive) {
+        server.sendJson(res, { status: "ok", database: "connected" });
+    } else {
+        server.error(res, 503, "Database unavailable");
+    }
+    return false;
+});
 
 /**
  * Get free slots at a given date

@@ -42,5 +42,7 @@
   "select_appointments_to_remove": "Seleziona gli appuntamenti che desideri cancellare:",
   "select_date": "Seleziona una data:",
   "send_mail": "Invia conferma",
+  "system_unavailable": "Sistema attualmente non disponibile",
+  "system_unavailable_message": "Il sistema di prenotazione degli appuntamenti non è al momento raggiungibile. Si prega di riprovare più tardi o di contattarci telefonicamente.",
   "yourappointments": "I tuoi appuntamenti"
 }

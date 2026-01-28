@@ -42,5 +42,7 @@
   "select_appointments_to_remove": "Izaberite termine koje želite da otkažete:",
   "select_date": "Izaberite datum:",
   "send_mail": "Pošalji potvrdu",
+  "system_unavailable": "Sistem trenutno nije dostupan",
+  "system_unavailable_message": "Sistem zakazivanja termina trenutno nije dostupan. Molimo pokušajte ponovo kasnije ili nas kontaktirajte telefonom.",
   "yourappointments": "Vaši termini"
 }

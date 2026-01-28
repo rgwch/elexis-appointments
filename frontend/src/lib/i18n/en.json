@@ -42,5 +42,7 @@
   "select_appointments_to_remove": "Select the appointments you would like to cancel:",
   "select_date": "Select a date:",
   "send_mail": "Send confirmation",
+  "system_unavailable": "System currently unavailable",
+  "system_unavailable_message": "The appointment system is currently unreachable. Please try again later or contact us by phone.",
   "yourappointments": "Your Appointments"
 }

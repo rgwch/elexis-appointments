@@ -62,10 +62,29 @@ async function doFetch(url: string, body?: any): Promise<any> {
     }
 }
 
-export function logout(){
+export function logout() {
     jwtToken = null
     user = null
 }
+
+/**
+ * Check if the system is available
+ * @returns true if the health check passes, false otherwise
+ */
+export async function checkHealth(): Promise<boolean> {
+    try {
+        const response = await fetch(baseURL + "/api/health")
+        if (response.ok) {
+            const data = await response.json()
+            return data.status === "ok"
+        }
+        return false
+    } catch (e) {
+        console.error("Health check failed:", e)
+        return false
+    }
+}
+
 export function formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
