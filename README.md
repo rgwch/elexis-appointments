@@ -113,6 +113,27 @@ and select the sites you want to secure.
 
 That's all. Certbot will manage and update the certificates as needed.
 
+## Install as a service
+
+You'll want to install this app as a service, so it runs automatically if the computer restarts.
+
+Bun plays well with the pm2 service manager. install it with `sudo npm i -g pm2`
+
+and add the following snippet to ecosystem.config.js:
+
+```
+{
+	name: "termine",
+	interpreter:"bun",
+	cwd: "/path/to/elexis-appointments",
+	script: "index.ts",
+	env: {
+    		PATH: `${process.env.HOME}/.bun/bin:${process.env.PATH}`
+  	}
+    }
+```
+Then you can `pm2 start termine`, `pm2 stop termine` or `pm2 restart termine` and so on.
+
 ## License
 
 
