@@ -9,7 +9,7 @@ bun >= 1.3.6 or node >= 22.15
 
 ## Launch development mode
 
-`bun run dev`or `npm run dev`
+`bun run dev` or `npm run dev`
 
 ## Build for production
 
