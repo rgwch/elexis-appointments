@@ -2,13 +2,14 @@
 
 ## Basics
 
-Elexis-Appointments is a tool to allow patients of an Elexis-operated practice to manage their appointments via internet themselves.
+Elexis-Appointments is a tool to allow patients of an [Elexis](http://github.com/elexis)-operated practice to manage their appointments via the internet themselves.
+They can book new appointments and modify their existing appointments.
 
 ### Prerequisites
 
 * A running Elexis database. For security reasons, it is recommended to run this tool not on the main Elexis-Server.
 * A database user with (at least) SELECT,INSERT,UPDATE privileges on "agntermine" and with SELECT privilege on "kontakt". For security reasons, it is recommended to create a specific user for this tool with the least possible privileges.
-* [Bun](https://bun.sh/) v. 1.3.6 or higher
+* [Bun](https://bun.sh/) v. 1.3.6 or higher (nodejs/npm will not work).
 * A domain name pointing to your router and a port forwarding from your router to the configured port of the computer running this app. If you have more than one webservice, you'll need a reverse proxy. See below for an example Apache2 configuration.
 
 ### Install and set up dependencies:
@@ -30,7 +31,7 @@ cp env.sample .env
 bun index.ts
 ```
 
-### Create standalone executable:
+### Create standalone executables:
 
 ```bash
 cd frontend
@@ -44,17 +45,20 @@ bun build --compile --minify --target=bun-darwin-x64 ./index.ts --outfile termin
 bun build --compile --minify --target=bun-darwin-arm64 ./index.ts --outfile termine-macos-arm64
 ```
 
-There's no big performance or usage difference in running the executable or running `bun index.ts`. The only relevant difference is, that the executable does not need a locally installed bun runtime.
+There's no big performance or usage difference in running the executable or running `bun index.ts`. The only relevant difference is that the executable does not need a locally installed bun runtime.
 
 ## Configure
 
 * Edit .env (copied from env.sample). See the comments in env.sample for explanations of the various options. 
 
 * Edit the files in frontend/src/lib/content as needed.
+  
+* Edit email-templates.json as needed
 
-* Edit frontend/src/lib/i18n/i18n.ts if more, less, or other languages are needed. Currently, the app is based on german and translated to english, french, italian, portuguese, russian, serbian, and tamil.
+* Edit frontend/src/lib/i18n/i18n.ts if more, less, or other languages are needed. Currently, the app is based on German and translated to English, French, Italian, Portuguese, Russian, Serbian, and Tamil.
 
 ## Integration
+
 
 Here's an example configuration for apache2:
 
@@ -82,6 +86,7 @@ Here's an example configuration for apache2:
         </VirtualHost>
 </IfModule>
 ```
+
 This config
 
 * expects that you have set up a domain `termine.myserver.ch` with your domain registrar that points to the public address of your router (either acquired with a dynamic dns service or with a static IP)
@@ -96,7 +101,7 @@ It is highly recommended to allow connections to your appointment service only v
 
 Set up for letsencrypt certificates is easy:
 
-* make the system work for unencrypted connections (domain, port forwarding and so on)
+First, make the system work for unencrypted connections and test it thoroughly (domain, port forwarding, connection with the database, and so on).
 
 Then:
 
@@ -108,3 +113,7 @@ and select the sites you want to secure.
 
 That's all. Certbot will manage and update the certificates as needed.
 
+## License
+
+
+This project is published under the MIT License. This means, in short: You may do whatever you like, but don't blame us for any faults or damages. The exact terms and conditions are in the file LICENSE.
