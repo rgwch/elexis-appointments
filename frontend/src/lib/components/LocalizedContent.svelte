@@ -22,7 +22,7 @@ Display the contents of a markdown file from ../content in the current locale.
                 // Fallback to German if locale file doesn't exist
                 import(`../content/${contentType}.de.md?raw`)
                     .then((module) => {
-                        content = module.default;
+                        content = module.default
                         loading = false;
                     })
                     .catch((err) => {
