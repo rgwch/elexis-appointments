@@ -1,3 +1,8 @@
+/**
+ * Tests for Elexis Appointments backend.
+ * Note: Needs a test database to run properly.
+ * (c) 2026 G. Weirich
+ */
 import { describe, test, expect, beforeAll, afterAll, mock } from "bun:test"
 import { SQL } from "bun"
 import {

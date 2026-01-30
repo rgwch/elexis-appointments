@@ -2,7 +2,7 @@
   "name": "elexis-appointments",
   "module": "index.ts",
   "type": "module",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "private": true,
   "devDependencies": {
     "@types/bun": "latest"

@@ -1,4 +1,7 @@
-// import "dotenv/config"
+/**
+ * Main module for Elexis Appointments backend
+ * (c) 2026 G. Weirich
+ */
 import type { termin, user } from "./types"
 import { sql, SQL } from "bun"
 import { Mailer } from "./mailer"
@@ -147,6 +150,7 @@ export async function takeSlot(date: string, startMinute: number, reason: string
             dauer: duration.toString(),
             grund: reason,
             termintyp: process.env.TerminTyp || "Normal",
+            terminstatus: process.env.CreatedState || "geplant",
             deleted: "0",
         }
     } catch (e) {

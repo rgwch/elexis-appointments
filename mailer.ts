@@ -1,4 +1,6 @@
-import ical, { ICalCalendarMethod, ICalEvent } from 'ical-generator';
+/**
+ * Simple wrapper around nodemailer
+ */
 import nodemailer from 'nodemailer';
 
 
