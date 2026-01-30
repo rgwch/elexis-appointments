@@ -26,7 +26,7 @@ server.addRoute("get", "/api/health", async (req, res) => {
 });
 
 /**
- * Get free slots at a given date
+ * Get free slots at a given date. Authentication required.
  */
 server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res) => {
     const params = server.getParams(req)
@@ -47,6 +47,9 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
     }
 })
 
+/**
+ * Send a verification token to the user's email address. Authentication required.
+ */
 server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
     const user = (req as any).user?.user;
     if (!user || !user.mail) {
@@ -65,6 +68,9 @@ server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
     return false
 })
 
+/**
+ * Verify verification token and return user data if valid
+ */
 server.addRoute("get", "/api/verifytoken", async (req, res) => {
     const params = server.getParams(req)
     const token = params.get("token")
@@ -85,6 +91,10 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
         return false
     }
 })
+
+/**
+ * Book an appointment slot for the currently logged in user. Authentication required.
+ */
 server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
     const startMinute = body.startMinute
@@ -107,7 +117,9 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
 })
 
 /**
- * Find existing appointments for the currently logged in user. If they are not verified, return 401 Unauthorized.
+ * Find existing appointments for the currently logged in user. 
+ * Authentication and additional verification required.
+ * If they are not verified, return 401 Unauthorized.
  */
 server.addRoute("get", "/api/findappointments", server.authorize, async (req, res) => {
     const params = server.getParams(req)
@@ -133,7 +145,9 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
 })
 
 /**
- * Delete an appointment by its ID for the currently logged in user. If they are not verified, return 401 Unauthorized.
+ * Cancel an appointment by its ID for the currently logged in user.
+ * Authentication and additional verification required. 
+ * If they are not verified, return 401 Unauthorized.
  */
 server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)

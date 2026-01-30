@@ -44,5 +44,6 @@
   "send_mail": "Envoyer la confirmation",
   "system_unavailable": "Système actuellement indisponible",
   "system_unavailable_message": "Le système de rendez-vous est actuellement inaccessible. Veuillez réessayer plus tard ou nous contacter par téléphone.",
+  "welcome": "Bienvenue",
   "yourappointments": "Vos rendez-vous"
 }

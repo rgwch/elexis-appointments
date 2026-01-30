@@ -1,10 +1,10 @@
-import type { termin } from "../../../types.d"
+import type { termin, user } from "../../../types.d"
 import { _ } from "svelte-i18n"
 import { DateTime } from "luxon"
 const port = import.meta.env.VITE_PORT || 3000
 export const baseURL = import.meta.env.DEV ? "http://localhost:" + port : ""
 let jwtToken: string | null = null
-let user: any = null
+let user: user | null = null
 let trl: any = null
 _.subscribe((value) => {
     trl = value
@@ -62,13 +62,24 @@ async function doFetch(url: string, body?: any): Promise<any> {
     }
 }
 
+/**
+ * remove jwt token and user info, effectively logging the user out.
+ */
 export function logout() {
     jwtToken = null
     user = null
 }
 
 /**
- * Check if the system is available
+ * Get the current logged in user
+ * @returns 
+ */
+export function getUser(): user | null {
+    return user
+}
+
+/**
+ * Check if the appointment server and the database are available
  * @returns true if the health check passes, false otherwise
  */
 export async function checkHealth(): Promise<boolean> {
@@ -85,6 +96,11 @@ export async function checkHealth(): Promise<boolean> {
     }
 }
 
+/**
+ * Create a time string from a number of minutes since midnight
+ * @param minutes 
+ * @returns 
+ */
 export function formatTime(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -111,10 +127,10 @@ export async function verifyEmailToken(token: string): Promise<boolean> {
 }
 
 /**
- * initial login with birthdate and mail
+ * initial login with birthdate and mail. If successful, stores jwt token and user info.
  * @param birthdate 
  * @param mail 
- * @returns 
+ * @returns true if login was successful, false otherwise
  */
 export async function checkAccess(birthdate: string, mail: string): Promise<boolean> {
     try {
@@ -162,11 +178,20 @@ export async function getFreeSlotsAt(date: Date): Promise<Array<number>> {
     return data.freeSlots
 }
 
+/**
+ * Find all appointments for the current user
+ * @returns 
+ */
 export async function findAppointments(): Promise<Array<termin>> {
-    const data = await doFetch(`/api/findappointments?patId=${user.id}`)
+    const data = await doFetch(`/api/findappointments?patId=${user!.id}`)
     return data
 }
 
+/**
+ * Find the next possible date with free slots starting from startDate
+ * @param startDate 
+ * @returns the next date with free slots. If no date is found in the next 30 days, an error is thrown.
+ */
 export const findNextPossibleDate = async (startDate: Date): Promise<Date> => {
     let date = new Date(startDate)
     for (let i = 0; i < 30; i++) { // Limit search to next 30 days
@@ -197,14 +222,21 @@ export const findPrevPossibleDate = async (startDate: Date): Promise<Date> => {
     throw new Error("No available dates in the previous 30 days")
 }
 
-
+/**
+ * Book an appointment
+ * @param date 
+ * @param startMinute 
+ * @param reason 
+ * @returns the booked appointment
+ * @throws error if booking fails
+ */
 export async function bookAppointment(date: Date, startMinute: number, reason: string): Promise<termin> {
     const headers = createHeader()
     const body = {
         date: date.toISOString(),
         startMinute,
         reason,
-        patId: user.id
+        patId: user!.id
     }
     try {
         const data = await doFetch(`/api/takeslot`, body)
@@ -218,10 +250,18 @@ export async function bookAppointment(date: Date, startMinute: number, reason: s
     }
 }
 
+/**
+ * Cancel an appointment
+ * @param appid 
+ */
 export async function removeAppointment(appid: string): Promise<void> {
     await doFetch(`/api/deleteappointment`, { appid, patId: user.id });
 }
 
+/**
+ * Send a confirmation mail for the appointment with the given id
+ * @param id 
+ */
 export async function sendConfirmationMail(id: string): Promise<void> {
     await doFetch(`/api/sendconfirmation?id=${id}`);
 }

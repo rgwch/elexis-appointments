@@ -5,8 +5,7 @@ import {
     takeSlot,
     deleteAppointment,
     findAppointments,
-    checkAccess,
-    verifyToken
+    checkAccess
 } from "./index"
 
 // Mock environment variables
@@ -53,7 +52,7 @@ describe("getFreeSlotsAt", () => {
         try {
             const slots = await getFreeSlotsAt(date)
             const slotsArray = Array.from(slots).sort((a, b) => a - b)
-            
+
             // Each consecutive free slot should be at least minFreeMinutes apart
             for (let i = 0; i < slotsArray.length - 1; i++) {
                 const current = slotsArray[i]
@@ -83,17 +82,17 @@ describe("takeSlot", () => {
     test("creates appointment with correct data structure", async () => {
         const date = "2026-03-15"
         const startMinute = 540 // 09:00
-        const duration = 15
+        const reason = "something important"
         const patId = "test-patient-id"
 
         try {
-            const termin = await takeSlot(date, startMinute, duration, patId)
-            
+            const termin = await takeSlot(date, startMinute, reason, patId)
+
             expect(termin).toBeDefined()
             expect(termin.id).toBeDefined()
             expect(termin.patid).toBe(patId)
             expect(termin.beginn).toBe(startMinute.toString())
-            expect(termin.dauer).toBe(duration.toString())
+            expect(termin.grund).toBe(reason)
             expect(termin.deleted).toBe("0")
         } catch (e) {
             console.log("Skipping test - database not available:", e)
@@ -123,7 +122,7 @@ describe("findAppointments", () => {
         try {
             const appointments = await findAppointments(patid)
             expect(Array.isArray(appointments)).toBe(true)
-            
+
             // Each appointment should have required fields
             appointments.forEach(appt => {
                 expect(appt.id).toBeDefined()
@@ -158,7 +157,7 @@ describe("checkAccess", () => {
         const result2 = await checkAccess("2000-01-01", "")
         const result3 = await checkAccess(null, "test@test.com")
         const result4 = await checkAccess("2000-01-01", null)
-        
+
         expect(result1).toBeNull()
         expect(result2).toBeNull()
         expect(result3).toBeNull()
@@ -171,9 +170,3 @@ describe("checkAccess", () => {
     })
 })
 
-describe("verifyToken", () => {
-    test("returns false for non-existent token", async () => {
-        const result = await verifyToken("non-existent-token")
-        expect(result).toBe(false)
-    })
-})

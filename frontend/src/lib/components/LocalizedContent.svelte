@@ -1,3 +1,6 @@
+<!-- @component
+Display the contents of a markdown file from ../content in the current locale.
+-->
 <script lang="ts">
     import { locale } from 'svelte-i18n';
 

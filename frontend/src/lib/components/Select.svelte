@@ -1,10 +1,21 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
-    import {logout} from '../io';
+    import type { user } from "../../../../types.d";
+    import { logout, getUser } from "../io";
+    import { onMount } from "svelte";
     let { mode = $bindable() } = $props();
+    let currentUser: user | null = $state<user | null>(null);
+
+    onMount(() => {
+        currentUser = getUser();
+        if (!currentUser) {
+            mode = "login";
+        }
+    });
 </script>
 
 <div class="card">
+    <p class="info-text" style="color:blue;font-weight:700;font-size:1.2rem;">{$_("welcome")}, {currentUser?.firstname} {currentUser?.lastname}</p>
     <p class="info-text">{$_("please_choose_option")}</p>
     <div class="options">
         <button class="option-btn" onclick={() => (mode = "book")}>
@@ -13,7 +24,13 @@
         <button class="option-btn" onclick={() => (mode = "display")}>
             {$_("remove_appointment")}
         </button>
-        <button class="option-btn" style="margin-top:12px;" onclick={() => {logout(); (mode = "login")}}>
+        <button
+            class="option-btn"
+            style="margin-top:12px;"
+            onclick={() => {
+                logout();
+                mode = "login";
+            }}>
             {$_("logout")}
         </button>
     </div>

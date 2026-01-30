@@ -44,5 +44,6 @@
   "send_mail": "Pošalji potvrdu",
   "system_unavailable": "Sistem trenutno nije dostupan",
   "system_unavailable_message": "Sistem zakazivanja termina trenutno nije dostupan. Molimo pokušajte ponovo kasnije ili nas kontaktirajte telefonom.",
+  "welcome": "Добродошли",
   "yourappointments": "Vaši termini"
 }

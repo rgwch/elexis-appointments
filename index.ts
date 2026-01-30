@@ -1,4 +1,4 @@
-import "dotenv/config"
+// import "dotenv/config"
 import type { termin, user } from "./types"
 import { sql, SQL } from "bun"
 import { Mailer } from "./mailer"
@@ -28,7 +28,7 @@ function elexisdateFromDate(date: Date): string {
 }
 
 /**
- * Get the free slots at a given date
+ * Get free slots at a given date between workStart and workEnd. will return at most maxPerDay slots.
  * @param date 
  * @returns A Set of numbers representing the free slots in minutes from midnight
  */
@@ -113,8 +113,8 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
 /**
  * Take a slot at a given date and time for a patient
  * @param date 
- * @param startMinute 
- * @param duration 
+ * @param startMinute minute from midnght
+ * @param reason 
  * @param patId 
  * @returns a Termin object representing the booked appointment or null if booking failed
  */
@@ -157,6 +157,11 @@ export async function takeSlot(date: string, startMinute: number, reason: string
     }
 }
 
+/**
+ * Cancel an appointment by setting its status to cancelledState
+ * @param appid id of the appointment to delete
+ * @param patid patient id for the appointment to delete
+ */
 export async function deleteAppointment(appid: string, patid: string): Promise<void> {
     const db = new SQL(process.env.database!)
     try {
@@ -175,7 +180,7 @@ export async function deleteAppointment(appid: string, patid: string): Promise<v
 /**
  * Find appointments for a given patient
  * @param patid id of the patient, which appointments to find
- * @returns 
+ * @returns all appointments for the given patient (including past appointments).
  */
 export async function findAppointments(patid: string): Promise<Array<termin>> {
     let db: SQL | null = null
@@ -194,6 +199,12 @@ export async function findAppointments(patid: string): Promise<Array<termin>> {
     }
 }
 
+/**
+ * Send a verification token email to the given address. Uses the configured email templates
+ * @param mail mail address
+ * @param token token to send
+ * @param validUntil validity to display in the email
+ */
 export async function sendToken(mail: string, token: string, validUntil: Date): Promise<void> {
     const mailer = new Mailer({
         host: process.env.SMTP_SERVER,
@@ -224,7 +235,10 @@ export async function sendToken(mail: string, token: string, validUntil: Date): 
     }
 }
 
-
+/**
+ * Send confirmation mail for appointment id. Uses the configured email templates.
+ * @param id id of the appointment to send the confirmation for
+ */
 export async function sendMail(id: string) {
     const db = new SQL(process.env.database!)
     try {
@@ -315,6 +329,7 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
         if (!birthdate || birthdate === "") return Promise.resolve(null)
         if (!mail || mail === "") return Promise.resolve(null)
         const dat = (birthdate || "01-01").split("-")
+    // some checks to prevent sql injection
         if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
         if (!/^\d+$/.test(dat[0]) || !/^\d+$/.test(dat[1]) || !/^\d+$/.test(dat[2])) return Promise.resolve(null)
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return Promise.resolve(null)

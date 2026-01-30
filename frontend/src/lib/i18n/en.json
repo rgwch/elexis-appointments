@@ -44,5 +44,6 @@
   "send_mail": "Send confirmation",
   "system_unavailable": "System currently unavailable",
   "system_unavailable_message": "The appointment system is currently unreachable. Please try again later or contact us by phone.",
+  "welcome": "Welcome",
   "yourappointments": "Your Appointments"
 }
