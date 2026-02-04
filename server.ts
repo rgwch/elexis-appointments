@@ -1,3 +1,7 @@
+/**
+ * Server entry point for Elexis Appointments backend
+ * (c) 2026 G. Weirich
+ */
 import { MikroRest } from '@rgwch/mikrorest'
 import {
     checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,

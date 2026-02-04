@@ -136,5 +136,8 @@ Then you can `pm2 start termine`, `pm2 stop termine` or `pm2 restart termine` an
 
 ## License
 
-
 This project is published under the MIT License. This means, in short: You may do whatever you like, but don't blame us for any faults or damages. The exact terms and conditions are in the file LICENSE.
+
+## Acknowledgements
+
+Parts of this program were created with substantial assistance of Github Copilot (Claude Sonnet 4.5)
