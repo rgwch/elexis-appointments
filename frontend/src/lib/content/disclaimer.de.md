@@ -6,9 +6,7 @@ Aber:
 
 Um mit diesem Tool einen Termin zu vereinbaren, müssen Sie Ihre E-Mail-Adresse und Ihr Geburtsdatum eingeben. Die Terminvergabe ist nur möglich, wenn Sie bei uns bereits als Patient/in angemeldet sind, und wenn wir Ihre E-Mail-Adresse genau so gespeichert haben, wie Sie sie hier angeben. Wenn das noch nicht der Fall ist, geben Sie uns bitte bei Ihrem nächsten Besuch die Mailadresse an.
 
-
-Wenn Sie einen Termin vereinbaren, dann werden die hier eingegebenen Daten mit Ihren bereits vorhandenen Personalien in unserer Patienten-Datenbank verknüpft und (von aussen nicht sichtbar) als Termin gespeichert. Wir geben keinerlei Daten weiter; bereits die Tatsache, dass Sie einen Termin vereinbaren, unterliegt dem Arztgeheimnis.
-
+Wenn Sie einen Termin vereinbaren, dann werden die hier eingegebenen Daten mit Ihren bereits vorhandenen Personalien in unserer Patienten-Datenbank verknüpft und (von aussen nicht sichtbar) zusammen mit Ihrer aktuellen IP (das ist eine Art Internet-Telefonnummer) als Termin gespeichert. Wir geben keinerlei Daten weiter; bereits die Tatsache, dass Sie einen Termin vereinbaren, unterliegt dem Arztgeheimnis.
 
 Falls Sie bei der Terminbuchung am Schluss "Bestätigung mailen" anklicken, dann wird eine Mail mit dem Termin via Internet an die angegebene Mailadresse geschickt. Beachten Sie, dass eine solche Mail unverschlüsselt und gegen Fremdeinblick nicht besser gesichert ist, als jede andere Mail auch. Wenn Sie nicht möchten, dass Drittpersonen erfahren könnten, dass Sie einen Termin bei uns vereinbart haben, sollten Sie diesen Button nicht anklicken.
 

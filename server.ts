@@ -101,6 +101,7 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
  */
 server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
+    const ip = req.socket.remoteAddress
     const startMinute = body.startMinute
     const reason = body.reason || ""
     const patId = body.patId
@@ -110,7 +111,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
         return false
     }
     try {
-        const termin = await takeSlot(date, startMinute, reason, patId)
+        const termin = await takeSlot(date, startMinute, reason, patId, ip)
         server.sendJson(res, termin)
         return false
     } catch (e) {

@@ -6,9 +6,7 @@ Mais :
 
 Pour prendre rendez-vous avec cet outil, vous devez saisir votre adresse e-mail et votre date de naissance. La prise de rendez-vous n'est possible que si vous êtes déjà enregistré comme patient chez nous et si nous avons votre adresse e-mail stockée exactement comme vous la saisissez ici. Si ce n'est pas encore le cas, veuillez nous communiquer votre adresse e-mail lors de votre prochaine visite.
 
-
-Lorsque vous prenez rendez-vous, les données saisies ici seront liées à vos données personnelles existantes dans notre base de données patients et enregistrées (non visibles de l'extérieur) comme rendez-vous. Nous ne transmettons aucune donnée ; le simple fait que vous preniez rendez-vous est soumis au secret médical.
-
+Lorsque vous prenez rendez-vous, les données saisies ici seront liées à vos données personnelles existantes dans notre base de données patients et enregistrées (non visibles de l'extérieur) avec votre adresse IP actuelle (une sorte de numéro de téléphone Internet) comme rendez-vous. Nous ne transmettons aucune donnée ; le simple fait que vous preniez rendez-vous est soumis au secret médical.
 
 Si vous cliquez sur « Envoyer la confirmation » à la fin de la réservation du rendez-vous, un e-mail avec le rendez-vous sera envoyé via Internet à l'adresse e-mail indiquée. Veuillez noter qu'un tel e-mail n'est pas crypté et n'est pas mieux protégé contre les regards indiscrets que tout autre e-mail. Si vous ne souhaitez pas que des tiers puissent apprendre que vous avez pris rendez-vous chez nous, vous ne devriez pas cliquer sur ce bouton.
 
