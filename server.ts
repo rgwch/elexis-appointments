@@ -7,7 +7,6 @@ import {
     checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,
     sendMail, takeSlot, sendToken, isDatabaseAlive
 } from "./index"
-import { decode } from 'node:punycode';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
