@@ -13,6 +13,9 @@ process.env.NODE_ENV = process.env.NODE_ENV || "development"
 
 const server = new MikroRest({ port, allowedOriginsProd: [`http://localhost:${port}`, ""] })
 
+if (process.env.LOGFILE) {
+    server.setLogfile(process.env.LOGFILE)
+}
 server.addStaticDir("./frontend/dist")
 
 /**
@@ -23,6 +26,7 @@ server.addRoute("get", "/api/health", async (req, res) => {
     if (dbAlive) {
         server.sendJson(res, { status: "ok", database: "connected" });
     } else {
+        console.error("Database connection failed in health check")
         server.error(res, 503, "Database unavailable");
     }
     return false;
@@ -56,6 +60,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
 server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
     const user = (req as any).user?.user;
     if (!user || !user.mail) {
+        console.error("User data missing or mail not set in /api/sendtoken")
         server.error(res, 400, "Missing mail parameter")
         return false
     }
@@ -86,10 +91,12 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
         if (user) {
             server.sendJson(res, { token, user })
         } else {
+            console.error("Invalid token in /api/verifytoken")
             server.error(res, 401, "Invalid token")
         }
         return false
     } catch (e) {
+        console.error("Error in /api/verifytoken:", e)
         server.error(res, 500, "Internal server error")
         return false
     }
@@ -106,6 +113,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const patId = body.patId
     const date = body.date
     if (startMinute === undefined || patId === undefined || !date) {
+        console.error("Missing parameters in /api/takeslot:", { startMinute, patId, date })
         server.error(res, 400, "Missing parameters")
         return false
     }
@@ -129,6 +137,7 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
     const params = server.getParams(req)
     const user = (req as any).user?.user;
     if (!user.verified) {
+        console.error("User not verified in /api/findappointments: ", user)
         server.error(res, 420, "2nd factor authentication required")
         return false
     }
@@ -157,6 +166,7 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
     const body = await server.readJsonBody(req)
     const user = (req as any).user?.user;
     if (!user.verified) {
+        console.error("User not verified in /api/deleteappointment: ", user)
         server.error(res, 401, "Unauthorized")
         return false
     }
