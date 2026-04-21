@@ -221,6 +221,32 @@ server.handleLogin("/api/checkaccess", async (mail, birthdate) => {
     }
 })
 
+/**
+ * Extract the real client IP from request headers
+ * Checks common headers set by reverse proxies, load balancers, and CDNs
+ */
+function getRealClientIP(req: any): string {
+    const headers = req.headers;
+    
+    // Check X-Forwarded-For header (most common)
+    if (headers['x-forwarded-for']) {
+        // X-Forwarded-For can contain multiple IPs, take the first one (original client)
+        const forwardedFor = headers['x-forwarded-for'].split(',')[0].trim();
+        if (forwardedFor) return forwardedFor;
+    }
+    
+    // Check other common headers
+    if (headers['x-real-ip']) return headers['x-real-ip'];
+    if (headers['x-client-ip']) return headers['x-client-ip'];
+    if (headers['cf-connecting-ip']) return headers['cf-connecting-ip']; // Cloudflare
+    if (headers['x-cluster-client-ip']) return headers['x-cluster-client-ip'];
+    if (headers['x-forwarded']) return headers['x-forwarded'];
+    if (headers['forwarded-for']) return headers['forwarded-for'];
+    if (headers['forwarded']) return headers['forwarded'];
+    
+    // Fallback to socket remote address
+    return req.socket.remoteAddress || 'unknown';
+}
 
 console.log("listening on port", port)
 server.start()
