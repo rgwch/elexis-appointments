@@ -24,7 +24,7 @@ server.addRoute("get", "/api/health", async (req, res) => {
     if (dbAlive) {
         server.sendJson(res, { status: "ok", database: "connected" });
     } else {
-        server.error(res, 503, "Database unavailable");
+        server.error(req,res, 503, "Database unavailable");
     }
     return false;
 });
@@ -36,7 +36,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
     const params = server.getParams(req)
     const dateStr = params.get("date")
     if (!dateStr) {
-        server.error(res, 400, "Missing date parameter")
+        server.error(req,res, 400, "Missing date parameter")
         return false
     }
     const date = new Date(dateStr)
@@ -46,7 +46,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
         return false
     } catch (e) {
         console.error("Error in /api/getfreeslotsat:", e)
-        server.error(res, 500, "Internal server error")
+        server.error(req,res, 500, "Internal server error")
         return false
     }
 })
@@ -57,7 +57,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
 server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
     const user = (req as any).user?.user;
     if (!user || !user.mail) {
-        server.error(res, 400, "Missing mail parameter")
+        server.error(req,res, 400, "Missing mail parameter")
         return false
     }
     const { token, validUntil } = MikroRest.createJWT({ ...user, verified: true })
@@ -66,7 +66,7 @@ server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
         server.sendJson(res, { success: true })
     } catch (e) {
         console.error("Error sending token mail:", e)
-        server.error(res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
     return false
@@ -79,7 +79,7 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
     const params = server.getParams(req)
     const token = params.get("token")
     if (!token) {
-        server.error(res, 400, "Missing token")
+        server.error(req, res, 400, "Missing token")
         return false
     }
     try {
@@ -87,11 +87,11 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
         if (user) {
             server.sendJson(res, { token, user })
         } else {
-            server.error(res, 401, "Invalid token")
+            server.error(req, res, 401, "Invalid token")
         }
         return false
     } catch (e) {
-        server.error(res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
 })
@@ -106,7 +106,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const patId = body.patId
     const date = body.date
     if (startMinute === undefined || patId === undefined || !date) {
-        server.error(res, 400, "Missing parameters")
+        server.error(req, res, 400, "Missing parameters")
         return false
     }
     try {
@@ -115,7 +115,7 @@ server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
         return false
     } catch (e) {
         console.error("Error in /api/takeslot:", e)
-        server.error(res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
 })
@@ -129,12 +129,12 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
     const params = server.getParams(req)
     const user = (req as any).user?.user;
     if (!user.verified) {
-        server.error(res, 420, "2nd factor authentication required")
+        server.error(req, res, 420, "2nd factor authentication required")
         return false
     }
     const patId = params.get("patId")
     if (!patId) {
-        server.error(res, 400, "Missing patId parameter")
+        server.error(req, res, 400, "Missing patId parameter")
         return false
     }
     try {
@@ -143,7 +143,7 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
         return false
     } catch (e) {
         console.error("Error in /api/findappointments:", e)
-        server.error(res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
 })
@@ -157,17 +157,17 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
     const body = await server.readJsonBody(req)
     const user = (req as any).user?.user;
     if (!user.verified) {
-        server.error(res, 401, "Unauthorized")
+        server.error(req, res, 401, "Unauthorized")
         return false
     }
     const patId = body.patId
     if (!patId) {
-        server.error(res, 400, "Missing patId parameter")
+        server.error(req, res, 400, "Missing patId parameter")
         return false
     }
     const appid = body.appid
     if (!appid) {
-        server.error(res, 400, "Missing appid parameter")
+        server.error(req, res, 400, "Missing appid parameter")
         return false
     }
     try {
@@ -176,7 +176,7 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
         return false
     } catch (e) {
         console.error("Error in /api/deleteappointment:", e)
-        server.error(res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
 })
@@ -188,7 +188,7 @@ server.addRoute("get", "/api/sendconfirmation", server.authorize, async (req, re
     const params = server.getParams(req)
     const id = params.get("id")
     if (!id) {
-        server.error(res, 400, "Missing id parameter")
+        server.error(req, res, 400, "Missing id parameter")
         return false
     }
     try {
@@ -196,7 +196,7 @@ server.addRoute("get", "/api/sendconfirmation", server.authorize, async (req, re
         server.sendJson(res, { success: true })
     } catch (e) {
         console.error("Error in /api/sendconfirmation:", e)
-        server.error(res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
     return false
