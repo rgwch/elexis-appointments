@@ -1,11 +1,10 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "elexis-appointments",
       "dependencies": {
-        "@rgwch/mikrorest": "^0.9.2",
+        "@rgwch/mikrorest": "^1.0.1",
         "@types/nodemailer": "^7.0.5",
         "ical-generator": "^10.0.0",
         "nodemailer": "^7.0.12",
@@ -83,7 +82,7 @@
 
     "@aws/lambda-invoke-store": ["@aws/lambda-invoke-store@0.2.3", "", {}, "sha512-oLvsaPMTBejkkmHhjf09xTgk71mOqyr/409NKhRIL08If7AhVfUsJhVsx386uJaqNd42v9kWamQ9lFbkoC2dYw=="],
 
-    "@rgwch/mikrorest": ["@rgwch/mikrorest@0.9.2", "", { "dependencies": { "jwt-simple": "^0.5.6" } }, "sha512-XSBRN8SmuZ3cYEJMcQVNnYelp0rmRxjiD8HW0V+kwpKQB0JNgKlGIhUOXcKPl5RQDWrYsCd8OZ7wecfl9Mx1Cw=="],
+    "@rgwch/mikrorest": ["@rgwch/mikrorest@1.0.1", "", { "dependencies": { "jwt-simple": "^0.5.6" } }, "sha512-I2IyP/F1zenXNmkK35f9K2oAk81GRqwcQ3a8KF1d3juFecrItQThdWaBKM/I/6bXoyN4W0NUVTE2aA4a+NaU1A=="],
 
     "@smithy/abort-controller": ["@smithy/abort-controller@4.2.8", "", { "dependencies": { "@smithy/types": "^4.12.0", "tslib": "^2.6.2" } }, "sha512-peuVfkYHAmS5ybKxWcfraK7WBBP0J+rkfUcbHJJKQ4ir3UAUNQI+Y4Vt/PqSzGqgloJ5O1dk7+WzNL8wcCSXbw=="],
 
