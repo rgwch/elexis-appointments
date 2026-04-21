@@ -7,13 +7,15 @@ import {
     checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,
     sendMail, takeSlot, sendToken, isDatabaseAlive
 } from "./index"
-import { decode } from 'node:punycode';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
 
 const server = new MikroRest({ port, allowedOriginsProd: [`http://localhost:${port}`, ""] })
 
+if (process.env.LOGFILE) {
+    server.setLogfile(process.env.LOGFILE)
+}
 server.addStaticDir("./frontend/dist")
 
 /**
@@ -24,7 +26,7 @@ server.addRoute("get", "/api/health", async (req, res) => {
     if (dbAlive) {
         server.sendJson(res, { status: "ok", database: "connected" });
     } else {
-        server.error(req,res, 503, "Database unavailable");
+        server.error(req, res, 503, "Database unavailable");
     }
     return false;
 });
@@ -36,7 +38,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
     const params = server.getParams(req)
     const dateStr = params.get("date")
     if (!dateStr) {
-        server.error(req,res, 400, "Missing date parameter")
+        server.error(req, res, 400, "Missing date parameter")
         return false
     }
     const date = new Date(dateStr)
@@ -46,7 +48,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
         return false
     } catch (e) {
         console.error("Error in /api/getfreeslotsat:", e)
-        server.error(req,res, 500, "Internal server error")
+        server.error(req, res, 500, "Internal server error")
         return false
     }
 })
@@ -57,7 +59,7 @@ server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res)
 server.addRoute("get", "/api/sendtoken", server.authorize, async (req, res) => {
     const user = (req as any).user?.user;
     if (!user || !user.mail) {
-        server.error(req,res, 400, "Missing mail parameter")
+        server.error(req, res, 400, "Missing mail parameter")
         return false
     }
     const { token, validUntil } = MikroRest.createJWT({ ...user, verified: true })
@@ -101,16 +103,18 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
  */
 server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
+    const ip = req.socket.remoteAddress
     const startMinute = body.startMinute
     const reason = body.reason || ""
     const patId = body.patId
     const date = body.date
     if (startMinute === undefined || patId === undefined || !date) {
+        console.error("Missing parameters in /api/takeslot:", { startMinute, patId, date })
         server.error(req, res, 400, "Missing parameters")
         return false
     }
     try {
-        const termin = await takeSlot(date, startMinute, reason, patId)
+        const termin = await takeSlot(date, startMinute, reason, patId, ip)
         server.sendJson(res, termin)
         return false
     } catch (e) {
@@ -129,6 +133,7 @@ server.addRoute("get", "/api/findappointments", server.authorize, async (req, re
     const params = server.getParams(req)
     const user = (req as any).user?.user;
     if (!user.verified) {
+        console.error("User not verified in /api/findappointments: ", user)
         server.error(req, res, 420, "2nd factor authentication required")
         return false
     }
@@ -157,6 +162,7 @@ server.addRoute("post", "/api/deleteappointment", server.authorize, async (req, 
     const body = await server.readJsonBody(req)
     const user = (req as any).user?.user;
     if (!user.verified) {
+        console.error("User not verified in /api/deleteappointment: ", user)
         server.error(req, res, 401, "Unauthorized")
         return false
     }

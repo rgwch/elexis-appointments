@@ -121,11 +121,14 @@ export async function getFreeSlotsAt(date: Date): Promise<Set<number>> {
  * @param patId 
  * @returns a Termin object representing the booked appointment or null if booking failed
  */
-export async function takeSlot(date: string, startMinute: number, reason: string, patId: string): Promise<termin> {
+export async function takeSlot(date: string, startMinute: number, reason: string, patId: string, origin: string | undefined): Promise<termin> {
     const db = new SQL(process.env.database!)
     const currentTime = Math.round(new Date().getTime() / 60000).toString();
     const id = Math.random().toString(36).substring(2, 10);
     const duration = parseInt(process.env.defaultAppointmentDuration || "15");
+    if (!origin) {
+        origin = "internet"
+    }
     try {
         const result = await db`
         INSERT INTO agntermine (id, bereich, tag, beginn, dauer, grund, deleted, patid,angelegt,erstelltvon, termintyp, terminstatus) 
@@ -138,7 +141,7 @@ export async function takeSlot(date: string, startMinute: number, reason: string
         "0", 
         ${patId} ,
          ${currentTime}, 
-        "internet", 
+        ${origin}, 
         ${process.env.TerminTyp || "Normal"}, 
         ${process.env.CreatedState || "geplant"})
     `
@@ -333,7 +336,7 @@ export async function checkAccess(birthdate: string | null, mail: string | null)
         if (!birthdate || birthdate === "") return Promise.resolve(null)
         if (!mail || mail === "") return Promise.resolve(null)
         const dat = (birthdate || "01-01").split("-")
-    // some checks to prevent sql injection
+        // some checks to prevent sql injection
         if (!dat || dat.length != 3 || !dat[0] || !dat[1] || !dat[2]) return Promise.resolve(null)
         if (!/^\d+$/.test(dat[0]) || !/^\d+$/.test(dat[1]) || !/^\d+$/.test(dat[2])) return Promise.resolve(null)
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) return Promise.resolve(null)
