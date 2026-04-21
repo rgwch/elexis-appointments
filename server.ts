@@ -247,3 +247,6 @@ function getRealClientIP(req: any): string {
     // Fallback to socket remote address
     return req.socket.remoteAddress || 'unknown';
 }
+
+console.log("listening on port", port)
+server.start()
