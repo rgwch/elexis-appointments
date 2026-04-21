@@ -7,6 +7,7 @@ import {
     checkAccess, deleteAppointment, findAppointments, getFreeSlotsAt,
     sendMail, takeSlot, sendToken, isDatabaseAlive
 } from "./index"
+import { get } from 'svelte/store';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3341;
 process.env.NODE_ENV = process.env.NODE_ENV || "development"
@@ -103,7 +104,7 @@ server.addRoute("get", "/api/verifytoken", async (req, res) => {
  */
 server.addRoute("post", "/api/takeslot", server.authorize, async (req, res) => {
     const body = await server.readJsonBody(req)
-    const ip = req.socket.remoteAddress
+    const ip = getRealClientIP(req)
     const startMinute = body.startMinute
     const reason = body.reason || ""
     const patId = body.patId
