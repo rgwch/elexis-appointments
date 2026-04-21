@@ -220,5 +220,7 @@ server.handleLogin("/api/checkaccess", async (mail, birthdate) => {
         return false
     }
 })
+
+
 console.log("listening on port", port)
 server.start()
