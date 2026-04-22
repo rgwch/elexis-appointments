@@ -37,8 +37,8 @@ server.addRoute("get", "/api/health", async (req, res) => {
  */
 server.addRoute("get", "/api/getfreeslotsat", server.authorize, async (req, res) => {
     const params = server.getParams(req)
-    const origin=getRealClientIP(req)
-    console.log("freeslots: "+ origin)
+    // const origin=getRealClientIP(req)
+    // console.log("freeslots: "+ origin)
     const dateStr = params.get("date")
     if (!dateStr) {
         server.error(req, res, 400, "Missing date parameter")
